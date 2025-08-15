@@ -46,13 +46,3 @@ streamlit/__pycache__/
 streamlit/nltk_data/
 streamlit/temp_exports/
 streamlit/.ipynb_checkpoints/
-
-# backups
-Backend/dream_complete_backup.sql
-**/*.sql
-
-
-# never commit SQL dumps
-Backend/dream_complete_backup.sql
-**/*.sql
-
