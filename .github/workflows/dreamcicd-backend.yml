@@ -1,0 +1,55 @@
+name: Dream CI/CD – Backend
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'Backend/**', '.github/workflows/dreamcicd-backend.yml' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'Backend/**', '.github/workflows/dreamcicd-backend.yml' ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: Backend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: echo "Backend CI check"
+
+  cd:
+    if: github.ref == 'refs/heads/main'
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rsync Backend -> server
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete --exclude="node_modules" --exclude=".env" --exclude=".env.*" --exclude="*.log"
+          path: Backend/
+          remote_path: /home/ubuntu/projects/dream/Backend/
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Install deps & PM2 reload
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            cd /home/ubuntu/projects/dream/Backend
+            for svc in gateway-service auth-service dispute-service settings-service template-service external-api-services; do
+              if [ -f "./$svc/package.json" ]; then
+                echo "Installing deps in $svc..."
+                cd "$svc"
+                npm ci --omit=dev || npm install --omit=dev
+                cd ..
+              fi
+            done
+            pm2 startOrReload /home/ubuntu/projects/dream/Backend/dream-ecosystem.config.js --env production
+            pm2 save
