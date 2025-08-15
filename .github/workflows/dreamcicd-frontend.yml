@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths: [ 'Frontend/**', '.github/workflows/dreamcicd-frontend.yml' ]
-  workflow_dispatch: {}   # enables "Run workflow"
+  workflow_dispatch: {}
 
 concurrency:
   group: dream-frontend
@@ -20,19 +20,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Quick diagnostics so we see what's going on
+      - name: Env & tree
+        run: |
+          node -v || true
+          npm -v || true
+          pwd
+          ls -la
+          test -f package-lock.json && echo "Found package-lock.json" || echo "No package-lock.json"
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: Frontend/package-lock.json
 
-      - run: npm ci || npm install
-      - env: { NODE_ENV: production }
+      # Use npm install (not npm ci) to avoid failing when there's no lockfile
+      - name: Install deps
+        run: npm install --no-fund --no-audit
+
+      - name: Build
+        env: { NODE_ENV: production }
         run: npm run build
 
       - name: Add build info
         run: |
           echo "{\"app\":\"dream-frontend\",\"sha\":\"$GITHUB_SHA\",\"run_id\":\"$GITHUB_RUN_ID\",\"ts\":\"$(date -u +%FT%TZ)\"}" > Frontend/dist/build-info.json
+          ls -la Frontend/dist | head
 
       - name: Add server to known_hosts
         run: |
@@ -44,7 +58,7 @@ jobs:
         with:
           switches: -avzr --delete
           path: Frontend/dist/
-          remote_path: /home/ubuntu/projects/dream/Frontend/dist/   # NOTE: capital F
+          remote_path: /home/ubuntu/projects/dream/Frontend/dist/   # capital F
           remote_host: ${{ secrets.SERVER_HOST }}
           remote_user: ${{ secrets.SERVER_USER }}
           remote_key: ${{ secrets.SERVER_SSH_KEY }}
