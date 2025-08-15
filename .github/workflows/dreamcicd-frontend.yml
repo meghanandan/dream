@@ -20,14 +20,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Quick diagnostics so we see what's going on
+      # Show exactly where we are and what files exist
       - name: Env & tree
         run: |
+          echo "=== ENV ==="
           node -v || true
-          npm -v || true
-          pwd
+          npm -v  || true
+          echo "PWD=$(pwd)"
+          echo "=== TREE (Frontend) ==="
           ls -la
-          test -f package-lock.json && echo "Found package-lock.json" || echo "No package-lock.json"
+          echo "package.json present?"; test -f package.json && echo YES || (echo NO && exit 1)
+          echo "lockfiles:"; ls -1 | egrep -i "package-lock.json|yarn.lock|pnpm-lock.yaml" || true
 
       - uses: actions/setup-node@v4
         with:
@@ -35,18 +38,23 @@ jobs:
           cache: npm
           cache-dependency-path: Frontend/package-lock.json
 
-      # Use npm install (not npm ci) to avoid failing when there's no lockfile
+      # Be tolerant of peer-dep conflicts (common on CI)
       - name: Install deps
-        run: npm install --no-fund --no-audit
+        run: npm install --no-fund --no-audit --legacy-peer-deps
 
+      # Build (print logs, fail clearly)
       - name: Build
-        env: { NODE_ENV: production }
-        run: npm run build
+        env: { NODE_ENV: production, CI: "false" } # avoid strict CI warnings killing the build
+        run: |
+          echo "=== START BUILD ==="
+          npm run build
+          echo "=== END BUILD ==="
+          test -d dist || (echo "dist/ not created by build" && exit 1)
 
       - name: Add build info
         run: |
-          echo "{\"app\":\"dream-frontend\",\"sha\":\"$GITHUB_SHA\",\"run_id\":\"$GITHUB_RUN_ID\",\"ts\":\"$(date -u +%FT%TZ)\"}" > Frontend/dist/build-info.json
-          ls -la Frontend/dist | head
+          echo "{\"app\":\"dream-frontend\",\"sha\":\"$GITHUB_SHA\",\"run_id\":\"$GITHUB_RUN_ID\",\"ts\":\"$(date -u +%FT%TZ)\"}" > dist/build-info.json
+          ls -la dist | head
 
       - name: Add server to known_hosts
         run: |
@@ -58,7 +66,7 @@ jobs:
         with:
           switches: -avzr --delete
           path: Frontend/dist/
-          remote_path: /home/ubuntu/projects/dream/Frontend/dist/   # capital F
+          remote_path: /home/ubuntu/projects/dream/Frontend/dist/   # Capital F
           remote_host: ${{ secrets.SERVER_HOST }}
           remote_user: ${{ secrets.SERVER_USER }}
           remote_key: ${{ secrets.SERVER_SSH_KEY }}
