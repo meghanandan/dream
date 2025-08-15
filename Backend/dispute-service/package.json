@@ -1,0 +1,22 @@
+{
+    "name": "dispute-service",
+    "version": "1.0.0",
+    "description": "Microservice to handle disputes",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "nodemon src/index.js"
+    },
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "dotenv": "^10.0.0",
+        "express": "^4.21.2",
+        "jsonwebtoken": "^9.0.2",
+        "mysql2": "^3.14.0",
+        "nodemon": "^3.1.7",
+        "pg": "^8.14.1",
+        "pg-hstore": "^2.3.3",
+        "sequelize": "^6.37.7"
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "name": "gateway-service",
+    "version": "1.0.0",
+    "description": "API Gateway for routing requests to microservices",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon src/index.js",
+        "dev": "nodemon src/index.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.5.0",
+        "express": "^4.21.2",
+        "express-http-proxy": "^1.6.2",
+        "http-proxy-middleware": "^3.0.5",
+        "jsonwebtoken": "^9.0.2",
+        "ws": "^8.18.2"
+    },
+    "keywords": [
+        "gateway",
+        "microservices",
+        "API",
+        "proxy"
+    ],
+    "author": "Simal Chaudhari",
+    "license": "MIT",
+    "devDependencies": {
+        "nodemon": "^3.1.9"
+    }
+}

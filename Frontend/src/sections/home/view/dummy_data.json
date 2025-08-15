@@ -1,0 +1,3214 @@
+{
+    "Quotas": {
+    "Last 12 Months": {
+      "statusData": [
+        {
+          "name": "Verified",
+          "value": 324,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "New",
+          "value": 145,
+          "color": "#2196F3"
+        },
+        {
+          "name": "In Progress",
+          "value": 182,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Return",
+          "value": 58,
+          "color": "#F44336"
+        },
+        {
+          "name": "Approved",
+          "value": 247,
+          "color": "#9C27B0"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 78
+        },
+        {
+          "month": "Jun 2024",
+          "value": 95
+        },
+        {
+          "month": "Jul 2024",
+          "value": 112
+        },
+        {
+          "month": "Aug 2024",
+          "value": 87
+        },
+        {
+          "month": "Sep 2024",
+          "value": 94
+        },
+        {
+          "month": "Oct 2024",
+          "value": 108
+        },
+        {
+          "month": "Nov 2024",
+          "value": 124
+        },
+        {
+          "month": "Dec 2024",
+          "value": 113
+        },
+        {
+          "month": "Jan 2025",
+          "value": 98
+        },
+        {
+          "month": "Feb 2025",
+          "value": 76
+        },
+        {
+          "month": "Mar 2025",
+          "value": 92
+        },
+        {
+          "month": "Apr 2025",
+          "value": 85
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 32
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 28
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 35
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 24
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 26
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 29
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 27
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 33
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 28
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 29
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 7
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 13
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 78.95,
+        "declineRate": 6.05,
+        "expirationRate": 2.14,
+        "voidRate": 1.85,
+        "trendData": [
+          75,
+          82,
+          79,
+          81,
+          77,
+          83,
+          86,
+          79,
+          74,
+          77,
+          82,
+          80
+        ]
+      },
+      "totalQuotas": 956
+    },
+    "Last 6 Months": {
+      "statusData": [
+        {
+          "name": "Verified",
+          "value": 186,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "New",
+          "value": 82,
+          "color": "#2196F3"
+        },
+        {
+          "name": "In Progress",
+          "value": 97,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Return",
+          "value": 29,
+          "color": "#F44336"
+        },
+        {
+          "name": "Approved",
+          "value": 143,
+          "color": "#9C27B0"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "Nov 2024",
+          "value": 124
+        },
+        {
+          "month": "Dec 2024",
+          "value": 113
+        },
+        {
+          "month": "Jan 2025",
+          "value": 98
+        },
+        {
+          "month": "Feb 2025",
+          "value": 76
+        },
+        {
+          "month": "Mar 2025",
+          "value": 92
+        },
+        {
+          "month": "Apr 2025",
+          "value": 85
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 32
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 28
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 35
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 24
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 26
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 29
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 27
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 33
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 28
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 29
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 7
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 13
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 80.34,
+        "declineRate": 5.32,
+        "expirationRate": 1.87,
+        "voidRate": 1.27,
+        "trendData": [
+          81,
+          83,
+          79,
+          78,
+          82,
+          79
+        ]
+      },
+      "totalQuotas": 537
+    },
+    "Last 3 Months": {
+      "statusData": [
+        {
+          "name": "Verified",
+          "value": 92,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "New",
+          "value": 41,
+          "color": "#2196F3"
+        },
+        {
+          "name": "In Progress",
+          "value": 47,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Return",
+          "value": 14,
+          "color": "#F44336"
+        },
+        {
+          "name": "Approved",
+          "value": 59,
+          "color": "#9C27B0"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "Feb 2025",
+          "value": 76
+        },
+        {
+          "month": "Mar 2025",
+          "value": 92
+        },
+        {
+          "month": "Apr 2025",
+          "value": 85
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 24
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 26
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 29
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 7
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 13
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 82.15,
+        "declineRate": 4.21,
+        "expirationRate": 1.12,
+        "voidRate": 1.02,
+        "trendData": [
+          80,
+          85,
+          90
+        ]
+      },
+      "totalQuotas": 253
+    }
+  },
+  "Disputes": {
+    "Last 12 Months": {
+      "statusData": [
+        {
+          "name": "Resolved",
+          "value": 310,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending Review",
+          "value": 145,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Under Review",
+          "value": 91,
+          "color": "#2196F3"
+        },
+        {
+          "name": "Escalated",
+          "value": 30,
+          "color": "#9C27B0"
+        },
+        {
+          "name": "Rejected",
+          "value": 23,
+          "color": "#F44336"
+        },
+        {
+          "name": "Withdrawn",
+          "value": 17,
+          "color": "#607D8B"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 65
+        },
+        {
+          "month": "Jun 2024",
+          "value": 122
+        },
+        {
+          "month": "Jul 2024",
+          "value": 96
+        },
+        {
+          "month": "Aug 2024",
+          "value": 60
+        },
+        {
+          "month": "Sep 2024",
+          "value": 123
+        },
+        {
+          "month": "Oct 2024",
+          "value": 57
+        },
+        {
+          "month": "Nov 2024",
+          "value": 142
+        },
+        {
+          "month": "Dec 2024",
+          "value": 108
+        },
+        {
+          "month": "Jan 2025",
+          "value": 137
+        },
+        {
+          "month": "Feb 2025",
+          "value": 52
+        },
+        {
+          "month": "Mar 2025",
+          "value": 118
+        },
+        {
+          "month": "Apr 2025",
+          "value": 139
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 21
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 23
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 41
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 43
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 30
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 21
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 20
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 24
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 29
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 43
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 44
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 21
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 29
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 5
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 5
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 20
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 20
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 6
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 18
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 19
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 18
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 11
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 85.26,
+        "declineRate": 9.59,
+        "expirationRate": 3.6,
+        "voidRate": 1.49,
+        "trendData": [
+          81,
+          77,
+          87,
+          91,
+          61,
+          80,
+          80,
+          97,
+          95,
+          82,
+          81,
+          68
+        ]
+      },
+      "totalDisputes": 556
+    },
+    "Last 6 Months": {
+      "statusData": [
+        {
+          "name": "Resolved",
+          "value": 286,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending Review",
+          "value": 139,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Under Review",
+          "value": 65,
+          "color": "#2196F3"
+        },
+        {
+          "name": "Escalated",
+          "value": 14,
+          "color": "#9C27B0"
+        },
+        {
+          "name": "Rejected",
+          "value": 37,
+          "color": "#F44336"
+        },
+        {
+          "name": "Withdrawn",
+          "value": 10,
+          "color": "#607D8B"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 80
+        },
+        {
+          "month": "Jun 2024",
+          "value": 116
+        },
+        {
+          "month": "Jul 2024",
+          "value": 117
+        },
+        {
+          "month": "Aug 2024",
+          "value": 86
+        },
+        {
+          "month": "Sep 2024",
+          "value": 69
+        },
+        {
+          "month": "Oct 2024",
+          "value": 143
+        },
+        {
+          "month": "Nov 2024",
+          "value": 139
+        },
+        {
+          "month": "Dec 2024",
+          "value": 130
+        },
+        {
+          "month": "Jan 2025",
+          "value": 114
+        },
+        {
+          "month": "Feb 2025",
+          "value": 108
+        },
+        {
+          "month": "Mar 2025",
+          "value": 92
+        },
+        {
+          "month": "Apr 2025",
+          "value": 115
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 49
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 22
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 50
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 39
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 39
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 41
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 26
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 48
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 28
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 26
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 36
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 49
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 20
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 20
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 7
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 18
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 7
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 20
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 8
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 90.58,
+        "declineRate": 6.82,
+        "expirationRate": 2.0,
+        "voidRate": 1.65,
+        "trendData": [
+          89,
+          60,
+          78,
+          98,
+          68,
+          65,
+          88,
+          61,
+          86,
+          78,
+          92,
+          61
+        ]
+      },
+      "totalDisputes": 745
+    },
+    "Last 3 Months": {
+      "statusData": [
+        {
+          "name": "Resolved",
+          "value": 257,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending Review",
+          "value": 133,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Under Review",
+          "value": 132,
+          "color": "#2196F3"
+        },
+        {
+          "name": "Escalated",
+          "value": 26,
+          "color": "#9C27B0"
+        },
+        {
+          "name": "Rejected",
+          "value": 32,
+          "color": "#F44336"
+        },
+        {
+          "name": "Withdrawn",
+          "value": 7,
+          "color": "#607D8B"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 149
+        },
+        {
+          "month": "Jun 2024",
+          "value": 74
+        },
+        {
+          "month": "Jul 2024",
+          "value": 150
+        },
+        {
+          "month": "Aug 2024",
+          "value": 124
+        },
+        {
+          "month": "Sep 2024",
+          "value": 99
+        },
+        {
+          "month": "Oct 2024",
+          "value": 60
+        },
+        {
+          "month": "Nov 2024",
+          "value": 77
+        },
+        {
+          "month": "Dec 2024",
+          "value": 133
+        },
+        {
+          "month": "Jan 2025",
+          "value": 130
+        },
+        {
+          "month": "Feb 2025",
+          "value": 89
+        },
+        {
+          "month": "Mar 2025",
+          "value": 92
+        },
+        {
+          "month": "Apr 2025",
+          "value": 91
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 42
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 50
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 26
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 45
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 29
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 30
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 38
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 49
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 42
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 44
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 24
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 37
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 34
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 20
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 16
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 16
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 15
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 6
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 20
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 14
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 78.27,
+        "declineRate": 3.81,
+        "expirationRate": 0.52,
+        "voidRate": 1.35,
+        "trendData": [
+          83,
+          94,
+          64,
+          94,
+          61,
+          68,
+          96,
+          81,
+          95,
+          70,
+          76,
+          92
+        ]
+      },
+      "totalDisputes": 750
+    }
+  },
+  "Adjustments": {
+    "Last 12 Months": {
+      "statusData": [
+        {
+          "name": "Approved",
+          "value": 200,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending",
+          "value": 194,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Rejected",
+          "value": 85,
+          "color": "#F44336"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 112
+        },
+        {
+          "month": "Jun 2024",
+          "value": 93
+        },
+        {
+          "month": "Jul 2024",
+          "value": 50
+        },
+        {
+          "month": "Aug 2024",
+          "value": 114
+        },
+        {
+          "month": "Sep 2024",
+          "value": 87
+        },
+        {
+          "month": "Oct 2024",
+          "value": 93
+        },
+        {
+          "month": "Nov 2024",
+          "value": 98
+        },
+        {
+          "month": "Dec 2024",
+          "value": 93
+        },
+        {
+          "month": "Jan 2025",
+          "value": 133
+        },
+        {
+          "month": "Feb 2025",
+          "value": 79
+        },
+        {
+          "month": "Mar 2025",
+          "value": 68
+        },
+        {
+          "month": "Apr 2025",
+          "value": 72
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 23
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 46
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 41
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 43
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 20
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 43
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 40
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 35
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 48
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 25
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 44
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 20
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 5
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 20
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 19
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 15
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 6
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 16
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 19
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 71.48,
+        "declineRate": 1.19,
+        "expirationRate": 4.37,
+        "voidRate": 1.22,
+        "trendData": [
+          63,
+          69,
+          85,
+          74,
+          93,
+          64,
+          100,
+          76,
+          74,
+          80,
+          73,
+          61
+        ]
+      },
+      "totalAdjustments": 327
+    },
+    "Last 6 Months": {
+      "statusData": [
+        {
+          "name": "Approved",
+          "value": 198,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending",
+          "value": 241,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Rejected",
+          "value": 91,
+          "color": "#F44336"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 78
+        },
+        {
+          "month": "Jun 2024",
+          "value": 74
+        },
+        {
+          "month": "Jul 2024",
+          "value": 78
+        },
+        {
+          "month": "Aug 2024",
+          "value": 120
+        },
+        {
+          "month": "Sep 2024",
+          "value": 64
+        },
+        {
+          "month": "Oct 2024",
+          "value": 113
+        },
+        {
+          "month": "Nov 2024",
+          "value": 136
+        },
+        {
+          "month": "Dec 2024",
+          "value": 106
+        },
+        {
+          "month": "Jan 2025",
+          "value": 131
+        },
+        {
+          "month": "Feb 2025",
+          "value": 73
+        },
+        {
+          "month": "Mar 2025",
+          "value": 115
+        },
+        {
+          "month": "Apr 2025",
+          "value": 59
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 26
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 48
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 25
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 47
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 25
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 34
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 36
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 44
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 49
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 22
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 30
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 29
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 15
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 15
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 11
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 16
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 20
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 19
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 10
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 94.97,
+        "declineRate": 6.4,
+        "expirationRate": 4.16,
+        "voidRate": 1.9,
+        "trendData": [
+          74,
+          61,
+          79,
+          85,
+          63,
+          100,
+          98,
+          97,
+          71,
+          92,
+          87,
+          78
+        ]
+      },
+      "totalAdjustments": 374
+    },
+    "Last 3 Months": {
+      "statusData": [
+        {
+          "name": "Approved",
+          "value": 362,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending",
+          "value": 300,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Rejected",
+          "value": 63,
+          "color": "#F44336"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 122
+        },
+        {
+          "month": "Jun 2024",
+          "value": 114
+        },
+        {
+          "month": "Jul 2024",
+          "value": 75
+        },
+        {
+          "month": "Aug 2024",
+          "value": 82
+        },
+        {
+          "month": "Sep 2024",
+          "value": 54
+        },
+        {
+          "month": "Oct 2024",
+          "value": 81
+        },
+        {
+          "month": "Nov 2024",
+          "value": 137
+        },
+        {
+          "month": "Dec 2024",
+          "value": 50
+        },
+        {
+          "month": "Jan 2025",
+          "value": 145
+        },
+        {
+          "month": "Feb 2025",
+          "value": 126
+        },
+        {
+          "month": "Mar 2025",
+          "value": 126
+        },
+        {
+          "month": "Apr 2025",
+          "value": 92
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 25
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 46
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 43
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 23
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 25
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 38
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 43
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 27
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 30
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 33
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 35
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 47
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 20
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 9
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 7
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 88.22,
+        "declineRate": 7.2,
+        "expirationRate": 2.89,
+        "voidRate": 1.62,
+        "trendData": [
+          99,
+          96,
+          95,
+          85,
+          67,
+          97,
+          64,
+          96,
+          94,
+          84,
+          73,
+          79
+        ]
+      },
+      "totalAdjustments": 750
+    }
+  },
+  "Payments": {
+    "Last 12 Months": {
+      "statusData": [
+        {
+          "name": "Completed",
+          "value": 2785,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending",
+          "value": 728,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Failed",
+          "value": 174,
+          "color": "#F44336"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 57
+        },
+        {
+          "month": "Jun 2024",
+          "value": 98
+        },
+        {
+          "month": "Jul 2024",
+          "value": 70
+        },
+        {
+          "month": "Aug 2024",
+          "value": 101
+        },
+        {
+          "month": "Sep 2024",
+          "value": 81
+        },
+        {
+          "month": "Oct 2024",
+          "value": 125
+        },
+        {
+          "month": "Nov 2024",
+          "value": 146
+        },
+        {
+          "month": "Dec 2024",
+          "value": 54
+        },
+        {
+          "month": "Jan 2025",
+          "value": 138
+        },
+        {
+          "month": "Feb 2025",
+          "value": 140
+        },
+        {
+          "month": "Mar 2025",
+          "value": 139
+        },
+        {
+          "month": "Apr 2025",
+          "value": 55
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 37
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 30
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 39
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 21
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 37
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 32
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 34
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 25
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 29
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 50
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 29
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 30
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 21
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 18
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 5
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 5
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 19
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 18
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 17
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 9
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 15
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 19
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 7
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 6
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 62.59,
+        "declineRate": 2.05,
+        "expirationRate": 2.93,
+        "voidRate": 1.8,
+        "trendData": [
+          89,
+          86,
+          64,
+          70,
+          75,
+          100,
+          63,
+          82,
+          65,
+          73,
+          66,
+          91
+        ]
+      },
+      "totalPayments": 3982
+    },
+    "Last 6 Months": {
+      "statusData": [
+        {
+          "name": "Completed",
+          "value": 1314,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending",
+          "value": 843,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Failed",
+          "value": 121,
+          "color": "#F44336"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 127
+        },
+        {
+          "month": "Jun 2024",
+          "value": 86
+        },
+        {
+          "month": "Jul 2024",
+          "value": 77
+        },
+        {
+          "month": "Aug 2024",
+          "value": 129
+        },
+        {
+          "month": "Sep 2024",
+          "value": 108
+        },
+        {
+          "month": "Oct 2024",
+          "value": 99
+        },
+        {
+          "month": "Nov 2024",
+          "value": 77
+        },
+        {
+          "month": "Dec 2024",
+          "value": 93
+        },
+        {
+          "month": "Jan 2025",
+          "value": 72
+        },
+        {
+          "month": "Feb 2025",
+          "value": 135
+        },
+        {
+          "month": "Mar 2025",
+          "value": 145
+        },
+        {
+          "month": "Apr 2025",
+          "value": 128
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 36
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 31
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 35
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 33
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 28
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 42
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 29
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 47
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 20
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 49
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 27
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 32
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 44
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 20
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 7
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 11
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 14
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 15
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 19
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 7
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 19
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 9
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 14
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 19
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 92.3,
+        "declineRate": 4.31,
+        "expirationRate": 3.64,
+        "voidRate": 1.62,
+        "trendData": [
+          75,
+          73,
+          98,
+          73,
+          73,
+          89,
+          94,
+          70,
+          93,
+          75,
+          84,
+          68
+        ]
+      },
+      "totalPayments": 3505
+    },
+    "Last 3 Months": {
+      "statusData": [
+        {
+          "name": "Completed",
+          "value": 1254,
+          "color": "#4CAF50"
+        },
+        {
+          "name": "Pending",
+          "value": 798,
+          "color": "#FFC107"
+        },
+        {
+          "name": "Failed",
+          "value": 154,
+          "color": "#F44336"
+        }
+      ],
+      "monthlyData": [
+        {
+          "month": "May 2024",
+          "value": 104
+        },
+        {
+          "month": "Jun 2024",
+          "value": 106
+        },
+        {
+          "month": "Jul 2024",
+          "value": 85
+        },
+        {
+          "month": "Aug 2024",
+          "value": 137
+        },
+        {
+          "month": "Sep 2024",
+          "value": 98
+        },
+        {
+          "month": "Oct 2024",
+          "value": 107
+        },
+        {
+          "month": "Nov 2024",
+          "value": 54
+        },
+        {
+          "month": "Dec 2024",
+          "value": 74
+        },
+        {
+          "month": "Jan 2025",
+          "value": 60
+        },
+        {
+          "month": "Feb 2025",
+          "value": 76
+        },
+        {
+          "month": "Mar 2025",
+          "value": 59
+        },
+        {
+          "month": "Apr 2025",
+          "value": 113
+        }
+      ],
+      "weeklyData": [
+        {
+          "week": "Week 1 (Jan 2025)",
+          "value": 41
+        },
+        {
+          "week": "Week 2 (Jan 2025)",
+          "value": 44
+        },
+        {
+          "week": "Week 3 (Jan 2025)",
+          "value": 45
+        },
+        {
+          "week": "Week 4 (Feb 2025)",
+          "value": 25
+        },
+        {
+          "week": "Week 5 (Feb 2025)",
+          "value": 41
+        },
+        {
+          "week": "Week 6 (Feb 2025)",
+          "value": 45
+        },
+        {
+          "week": "Week 7 (Feb 2025)",
+          "value": 48
+        },
+        {
+          "week": "Week 8 (Mar 2025)",
+          "value": 22
+        },
+        {
+          "week": "Week 9 (Mar 2025)",
+          "value": 24
+        },
+        {
+          "week": "Week 10 (Mar 2025)",
+          "value": 38
+        },
+        {
+          "week": "Week 11 (Mar 2025)",
+          "value": 43
+        },
+        {
+          "week": "Week 12 (Apr 2025)",
+          "value": 33
+        },
+        {
+          "week": "Week 13 (Apr 2025)",
+          "value": 31
+        }
+      ],
+      "dailyData": [
+        {
+          "date": "Sat 15 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Sun 16 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Mon 17 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Tue 18 Mar 2025",
+          "value": 16
+        },
+        {
+          "date": "Wed 19 Mar 2025",
+          "value": 19
+        },
+        {
+          "date": "Thu 20 Mar 2025",
+          "value": 20
+        },
+        {
+          "date": "Fri 21 Mar 2025",
+          "value": 20
+        },
+        {
+          "date": "Sat 22 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Sun 23 Mar 2025",
+          "value": 13
+        },
+        {
+          "date": "Mon 24 Mar 2025",
+          "value": 9
+        },
+        {
+          "date": "Tue 25 Mar 2025",
+          "value": 17
+        },
+        {
+          "date": "Wed 26 Mar 2025",
+          "value": 10
+        },
+        {
+          "date": "Thu 27 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Fri 28 Mar 2025",
+          "value": 12
+        },
+        {
+          "date": "Sat 29 Mar 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 30 Mar 2025",
+          "value": 6
+        },
+        {
+          "date": "Mon 31 Mar 2025",
+          "value": 15
+        },
+        {
+          "date": "Tue 01 Apr 2025",
+          "value": 7
+        },
+        {
+          "date": "Wed 02 Apr 2025",
+          "value": 16
+        },
+        {
+          "date": "Thu 03 Apr 2025",
+          "value": 5
+        },
+        {
+          "date": "Fri 04 Apr 2025",
+          "value": 6
+        },
+        {
+          "date": "Sat 05 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Sun 06 Apr 2025",
+          "value": 9
+        },
+        {
+          "date": "Mon 07 Apr 2025",
+          "value": 16
+        },
+        {
+          "date": "Tue 08 Apr 2025",
+          "value": 13
+        },
+        {
+          "date": "Wed 09 Apr 2025",
+          "value": 10
+        },
+        {
+          "date": "Thu 10 Apr 2025",
+          "value": 19
+        },
+        {
+          "date": "Fri 11 Apr 2025",
+          "value": 18
+        },
+        {
+          "date": "Sat 12 Apr 2025",
+          "value": 8
+        },
+        {
+          "date": "Sun 13 Apr 2025",
+          "value": 12
+        },
+        {
+          "date": "Mon 14 Apr 2025",
+          "value": 12
+        }
+      ],
+      "successMetrics": {
+        "completionRate": 70.4,
+        "declineRate": 9.54,
+        "expirationRate": 3.17,
+        "voidRate": 1.03,
+        "trendData": [
+          80,
+          86,
+          84,
+          73,
+          95,
+          79,
+          94,
+          87,
+          63,
+          84,
+          100,
+          72
+        ]
+      },
+      "totalPayments": 2692
+    }
+  }
+}

@@ -1,0 +1,6 @@
+start cmd /k "cd gateway-service && npm run dev"
+start cmd /k "cd auth-service && npm run dev"
+start cmd /k "cd template-service && npm run dev"
+start cmd /k "cd settings-service && npm run dev"
+start cmd /k "cd dispute-service && npm run dev"
+start cmd /k "cd external-api-services && npm run dev"

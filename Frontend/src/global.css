@@ -1,0 +1,362 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/** **************************************
+* Plugins
+*************************************** */
+/* scrollbar */
+@import './components/scrollbar/styles.css';
+
+/* image */
+@import './components/image/styles.css';
+
+/* map */
+@import './components/map/styles.css';
+
+/* lightbox */
+@import './components/lightbox/styles.css';
+
+/* chart */
+@import './components/chart/styles.css';
+
+/** **************************************
+* Baseline
+*************************************** */
+html {
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+/* body {
+  font-family: 'Poppins', sans-serif !important;
+} */
+/*MEGH CSS*/
+body .forgot-password .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl{
+background-color: transparent;
+}
+.forgot-password > div > div{background-color: #ffffff;}
+.forgot-password > div > div.css-17q5pk5-MuiFormHelperText-root{background-color: transparent;}
+.br-top{ border-top: 2px solid #FF9800 !important; border-radius: 0 0 8px 8px  !important;}
+.orange-button {
+  background-color: #ff9800 !important;
+  border-color: #ff9800 !important;
+  color: white !important;
+}
+.react-flow{background: #ffffff; border-radius: 10px;}
+.orange-button:hover {
+  background-color: #e98c00 !important;
+  border-color: #e98c00 !important;
+}
+.MuiBreadcrumbs-li a, .MuiBreadcrumbs-li p{text-decoration: none; color: inherit;}
+.css-eopt57-MuiFormLabel-root-MuiInputLabel-root.MuiInputLabel-shrink.Mui-focused{background-color: #fff;}
+body .loginBox {
+  background-color: #fff6eb;
+}
+body .MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl{background-color: #fff;}
+body .loginBox .loginBox-left {
+}
+body .loginBox .loginBox-Right .MuiPaper-elevation {
+  background: linear-gradient(to bottom, #ffc038, #ff9101);
+  min-height: 580px;
+  border-radius: 15px;
+  max-width: 600px;
+}
+body .loginBox .loginBox-left .logo {
+}
+body .loginBox .loginBox-left .logo img {
+  width: 110px;
+  position: absolute;
+  top: 10%;
+}
+body .loginBox .loginBox-left .loginFieldBox .loginTitle {
+  font-family: 'Poppins';
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+body .loginBox .css-ztbmyx-MuiButtonBase-root-MuiButton-root-MuiLoadingButton-root {
+  background-color: #ff9000;
+  font-family: 'Poppins';
+  margin-top: 1rem;
+}
+body .loginBox .css-ztbmyx-MuiButtonBase-root-MuiButton-root-MuiLoadingButton-root:hover {
+  background-color: #fd8f00;
+}
+body .loginBox .loginBox-Right .MuiPaper-elevation.slider h4 {
+  font-size: 2.5rem;
+  font-family: 'Poppins';
+  text-align: left;
+}
+body .loginBox .loginBox-Right .MuiPaper-elevation.slider h6 {
+  font-size: 1rem;
+  font-family: 'Poppins';
+  text-align: left;
+}
+body .loginBox .loginBox-Right .MuiPaper-elevation.slider .css-1sqn6rq-MuiTypography-root {
+  font-size: 3rem;
+  margin: 2rem 0 0 0;
+  line-height: 1rem;
+}
+/* body .loginBox .loginBox-Right .MuiPaper-elevation.slider p::before{content: '"'; position: absolute; font-size: 5rem; top: 14%;} */
+body .loginBox .loginBox-Right .MuiPaper-elevation.slider p {
+  font-size: 1rem;
+  font-family: 'Poppins';
+  text-align: left;
+}
+body .loginBox .css-1lpmg4l-MuiTypography-root-MuiLink-root {
+  color: #545454;
+  font-family: 'Poppins';
+  text-decoration: underline;
+}
+body .loginBox .css-2kdhh2-MuiOutlinedInput-notchedOutline {
+}
+body .loginBox .loginBox-Right .MuiPaper-elevation.slider .css-xakj0q {
+  bottom: 40%;
+}
+body .loginBox .loginBox-Right .MuiPaper-elevation.slider .css-uikoan {
+  bottom: 5%;
+}
+.delete-icon {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  background-color: white;
+  border-radius: 50%;
+  font-size: 18px;
+  color: red;
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+
+.delete-icon:hover {
+  transform: scale(1.1);
+}
+/* .css-1b887kh-MuiTypography-root,
+.css-ogudp8-MuiTypography-root,
+.css-1p32ey4-MuiTypography-root,
+.css-2s1y0q-MuiButtonBase-root .mnl__nav__item__title,
+.css-kimadl-MuiButtonBase-root .mnl__nav__item__title,
+.css-11gibpw-MuiButtonBase-root,
+.css-kimadl-MuiButtonBase-root,
+.css-8m5mqb-MuiTypography-root {
+  font-family: 'Poppins', sans-serif !important;
+} */
+.css-b6kycg{background-color: #ffffff;}
+.tree-div{
+  position: relative; min-height: 80vh; overflow-y: auto;
+}
+
+.css-1p14k6q .simplebar-content,
+.css-exmzxe,
+.css-16rsm6e,
+.MuiStack-root.nav__section__mini.css-1h9i34n-MuiStack-root {
+  background-color: #fefefe;
+}
+.main.layout__main.MuiBox-root.css-7d7xpv {
+  background-color: #ebf0f5;
+}
+/* .css-exmzxe .MuiTypography-root.MuiTypography-h5,
+.css-2s1y0q-MuiButtonBase-root,
+.mnl__logo__root.MuiBox-root.css-1gb3in6,
+.css-11gibpw-MuiButtonBase-root,
+.MuiButtonBase-root.mnl__nav__item.css-2s1y0q-MuiButtonBase-root,
+.mnl__nav__li.MuiBox-root.css-1k4u0p5 .css-kimadl-MuiButtonBase-root,
+.mnl__nav__li.MuiBox-root.css-1k4u0p5 .css-1ulz685-MuiButtonBase-root,
+.MuiButtonBase-root.mnl__nav__item.css-11gibpw-MuiButtonBase-root {
+  color: #fff;
+} */
+.MuiButtonBase-root.mnl__nav__item.state--active.css-mn96zp-MuiButtonBase-root {
+  color: #ff9800;
+}
+.css-18ag7ag-MuiToolbar-root {
+  box-shadow: 1px 2px 3px #d4d4d4;
+}
+.MuiButtonBase-root.custom-btn {
+  background-color: #ff9800;
+}
+.MuiButtonBase-root.custom-btn:hover {
+  background-color: #545454;
+}
+.custom-table .ant-table {
+  border: 1px solid #e8e8e8 !important;
+}
+.custom-table .ant-table-thead > tr > th,
+.custom-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #e8e8e8 !important;
+}
+.custom-table .ant-table-tbody > tr:hover > td {
+  background-color: #fafafa;
+  transition: background-color 0.2s;
+}
+
+/* body .css-exmzxe .MuiTypography-root.MuiTypography-h5, 
+body .css-2s1y0q-MuiButtonBase-root, 
+body .mnl__logo__root.MuiBox-root.css-1gb3in6, 
+body .css-11gibpw-MuiButtonBase-root, 
+body .MuiButtonBase-root.mnl__nav__item.css-2s1y0q-MuiButtonBase-root, 
+body .mnl__nav__li.MuiBox-root.css-1k4u0p5 .css-kimadl-MuiButtonBase-root, 
+body .mnl__nav__li.MuiBox-root.css-1k4u0p5 .css-1ulz685-MuiButtonBase-root, 
+body .MuiButtonBase-root.mnl__nav__item.css-11gibpw-MuiButtonBase-root {
+  color: #545454;
+} */
+body .MuiBox-root.css-exmzxe a img{width: 100px;}
+body .MuiBox-root.css-16rsm6e a img{width: 60px; margin: 0 auto;}
+/*MEGH CSS*/
+body .MuiBox-root.css-1nx7rgm .css-1odg0hw-MuiButtonBase-root-MuiIconButton-root{background-color: #fda92d; color: #fff;}
+body .MuiBox-root.css-8w3fte .css-qo31td-MuiButtonBase-root-MuiIconButton-root{background-color: #545454; color: #fff;}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: none;
+}
+input[type='number']::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+input[type='number']::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+label#demo-simple-select-label {
+  background-color: #fff !important;
+}
+label.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined.MuiFormLabel-colorPrimary.Mui-focused.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined.css-1vwqzjs-MuiFormLabel-root-MuiInputLabel-root {
+  background-color: #fff !important;
+}
+label.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined.MuiFormLabel-colorPrimary.MuiFormLabel-filled.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiInputLabel-sizeMedium.MuiInputLabel-outlined.css-1vwqzjs-MuiFormLabel-root-MuiInputLabel-root {
+  background-color: #fff !important;
+}
+.MuiInputLabel-outlined.css-jpp5th {
+  background-color: #fff !important;
+}
+.MuiInputLabel-outlined .css-jpp5th {
+  background-color: #fff !important;
+}
+.css-jpp5th.MuiInputLabel-shrink {
+  background-color: #fff !important;
+  padding-right: 5px !important;
+}
+
+th.MuiTableCell-root.MuiTableCell-head.MuiTableCell-sizeMedium.css-3wsvra-MuiTableCell-root {
+  color: #fda92d !important;
+}
+/* .custom-table-u{
+  width: 200% !important;
+} */
+.MuiAvatar-root.MuiAvatar-circular.MuiAvatar-colorDefault.css-1g5es9d-MuiAvatar-root {
+  font-size: 15px;
+}
+main.layout__main.MuiBox-root.css-7d7xpv {
+  /* --tw-bg-opacity: 1; 
+  background-color: rgb(248 250 252 / var(--tw-bg-opacity)); */
+  background-color: #eef2f6;
+}
+.css-3wsvra-MuiTableCell-root {
+  background-color: #fff8ef !important ;
+}
+.css-1f02bf9 {
+  background-color: #fff8ef !important ;
+}
+th.MuiTableCell-root.MuiTableCell-head.MuiTableCell-sizeMedium.css-1f02bf9 {
+  color: #fda92d !important;
+}
+.logoColor {
+  color: #fda92d;
+}
+.css-1gb3in6 {
+  width: 92px !important;
+  height: 37px !important;
+}
+
+.react-flow__attribution.bottom.right {
+  display: none !important;
+}
+
+.MuiAvatar-root.MuiAvatar-circular.MuiAvatar-colorDefault.css-hq23pa {
+  font-size: 1rem !important;
+}
+
+span.ant-picker-suffix {
+  color: coral !important;
+  font-size: large !important;
+}
+
+.ant-picker.ant-picker-outlined.css-dev-only-do-not-override-240cud {
+  background-color: none !important;
+}
+
+.ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
+  border-color: #eea81b !important;
+  background-color: #eea81b !important;
+}
+.btn{
+  color: #fff !important;
+  font-weight: 700;
+  border-radius: 30px;
+  border: none;
+  padding: 10px 20px;
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-add { background: #ff8c00;}
+.btn-add:hover { background: #ff8c00;}
+
+button.ant-btn.css-dev-only-do-not-override-240cud.ant-btn-default.ant-btn-color-default.ant-btn-variant-outlined.btn-add {
+  background: #ff8c00; /* Darker shade on hover */
+  color: #fff; /* Ensure text color remains white */
+}
+.btn-upload {
+  color: #ff8c00;
+  font-weight: 700;
+}
+
+button.ant-btn.css-dev-only-do-not-override-240cud.ant-btn-text.ant-btn-color-default.ant-btn-variant-text.btn-upload {
+  color: #ff8c00;
+}
+
+th.ant-table-cell {
+  background: #fbfaf9;
+  font-family: 'Poppins';
+}
+td.ant-table-cell {
+  font-family: 'Poppins';
+}
+li.ant-pagination-item.ant-pagination-item-1.ant-pagination-item-active {
+  border-color: #ff8c00;
+  color: #ff8c00;
+}
+
+.table-row-white {
+  background-color: white;
+}
+
+.table-row-gray {
+  background-color: #f5f5f5; /* Light gray */
+}
+
+/* When the checkbox is clicked */
+.ant-checkbox-input:checked + .ant-checkbox-inner {
+  background-color: #ff8c00 !important;
+  border-color: #ff8c00 !important;
+}
+.ant-pagination .ant-pagination-item-active a {
+  color: #ff8c00;
+}
+.blur-background {
+  filter: blur(5px); /* Adjust blur intensity */
+  pointer-events: none; /* Prevent interaction with background */
+}
+
+button.ant-btn.css-dev-only-do-not-override-240cud.ant-btn-default.ant-btn-color-default.ant-btn-variant-outlined.btn-upload {
+  /* background: #FF8C00; Darker shade on hover */
+  color: #ff8c00;
+}
+
+.custom-table .ant-table-thead > tr > th {
+  background-color: #fff8ef !important; /* Change header background */
+  color: #ff8c00 !important; /* Change text color */
+  /* font-weight: bold; */
+}

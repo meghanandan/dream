@@ -1,0 +1,1 @@
+import{j as t,H as e,C as i}from"./index-cVH_xp6I.js";import{J as s}from"./jwt-password-view-hGymbqOE.js";import"./VisibilityOff-9P1LaXwE.js";const n={title:`Login - ${i.site.name}`};function o(){return t.jsxs(t.Fragment,{children:[t.jsx(e,{children:t.jsxs("title",{children:[" ",n.title]})}),t.jsx(s,{})]})}export{o as default};

@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  gateway:
+    build: ./gateway-service
+    ports:
+      - "4000:4000"
+
+  dispute-service:
+    build: ./dispute-service
+    ports:
+      - "4001:4001"
+    environment:
+      - DB_HOST=db
+      - DB_USER=user
+      - DB_PASS=password
+      - DB_NAME=disputeDB
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "4002:4002"
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: disputeDB
+    ports:
+      - "5432:5432"
+
+  ui:
+    build: ./ui
+    ports:
+      - "3000:3000"

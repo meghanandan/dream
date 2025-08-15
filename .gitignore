@@ -1,0 +1,48 @@
+# --- Ignore everything by default
+*
+
+# --- Always keep repo meta
+!.gitignore
+!.gitattributes
+!README.md
+!LICENSE
+!.editorconfig
+
+# --- Keep CI workflows
+!.github/
+!.github/**
+
+# --- Keep project folders (CASE-SENSITIVE!)
+!Backend/
+!Backend/**
+!Frontend/
+!Frontend/**
+!streamlit/
+!streamlit/**
+
+# --- Re-ignore common build & env stuff anywhere
+**/node_modules/
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+**/.cache/
+**/coverage/
+**/*.log
+**/.DS_Store
+**/Thumbs.db
+**/.vscode/
+**/.idea/
+**/__pycache__/
+**/venv/
+**/.venv/
+**/.env
+**/.env.*
+**/*.zip
+
+# --- Streamlit extras
+streamlit/venv/
+streamlit/__pycache__/
+streamlit/nltk_data/
+streamlit/temp_exports/
+streamlit/.ipynb_checkpoints/
