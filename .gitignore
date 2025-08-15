@@ -51,3 +51,8 @@ streamlit/.ipynb_checkpoints/
 Backend/dream_complete_backup.sql
 **/*.sql
 
+
+# never commit SQL dumps
+Backend/dream_complete_backup.sql
+**/*.sql
+
