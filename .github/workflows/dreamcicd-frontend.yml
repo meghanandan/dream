@@ -4,48 +4,36 @@ on:
   push:
     branches: [ main ]
     paths: [ 'Frontend/**', '.github/workflows/dreamcicd-frontend.yml' ]
-  pull_request:
-    branches: [ main ]
-    paths: [ 'Frontend/**', '.github/workflows/dreamcicd-frontend.yml' ]
-  workflow_dispatch: {}   # <-- enables the "Run workflow" button
+  workflow_dispatch: {}   # enables "Run workflow"
 
 concurrency:
   group: dream-frontend
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  ci:
+  deploy:
     runs-on: ubuntu-latest
     defaults: { run: { working-directory: Frontend } }
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: Frontend/package-lock.json
+
       - run: npm ci || npm install
       - env: { NODE_ENV: production }
         run: npm run build
-      - name: Add build info file
+
+      - name: Add build info
         run: |
-          echo "{\"app\":\"dream-frontend\",\"sha\":\"$GITHUB_SHA\",\"run_id\":\"$GITHUB_RUN_ID\",\"timestamp\":\"$(date -u +%FT%TZ)\"}" > Frontend/dist/build-info.json
-      - uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: Frontend/dist
+          echo "{\"app\":\"dream-frontend\",\"sha\":\"$GITHUB_SHA\",\"run_id\":\"$GITHUB_RUN_ID\",\"ts\":\"$(date -u +%FT%TZ)\"}" > Frontend/dist/build-info.json
 
-  cd:
-    if: github.ref == 'refs/heads/main'
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: dist
-
-      # (optional) silence first-time host-key prompt
       - name: Add server to known_hosts
         run: |
           mkdir -p ~/.ssh
@@ -55,8 +43,8 @@ jobs:
         uses: burnett01/rsync-deployments@6.0.0
         with:
           switches: -avzr --delete
-          path: dist/
-          remote_path: /home/ubuntu/projects/dream/Frontend/dist/   # <- Capital F
+          path: Frontend/dist/
+          remote_path: /home/ubuntu/projects/dream/Frontend/dist/   # NOTE: capital F
           remote_host: ${{ secrets.SERVER_HOST }}
           remote_user: ${{ secrets.SERVER_USER }}
           remote_key: ${{ secrets.SERVER_SSH_KEY }}
