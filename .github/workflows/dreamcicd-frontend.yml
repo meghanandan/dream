@@ -4,20 +4,33 @@ on:
   push:
     branches: [ main ]
     paths: [ 'Frontend/**', '.github/workflows/dreamcicd-frontend.yml' ]
-  workflow_dispatch: {}   # manual run / rollback
+  workflow_dispatch: {}
 
 concurrency:
   group: dream-frontend
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  ci-cd:
+  deploy:
     runs-on: ubuntu-latest
     defaults: { run: { working-directory: Frontend } }
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      # Show exactly where we are and what files exist
+      - name: Env & tree
+        run: |
+          echo "=== ENV ==="
+          node -v || true
+          npm -v  || true
+          echo "PWD=$(pwd)"
+          echo "=== TREE (Frontend) ==="
+          ls -la
+          echo "package.json present?"; test -f package.json && echo YES || (echo NO && exit 1)
+          echo "lockfiles:"; ls -1 | egrep -i "package-lock.json|yarn.lock|pnpm-lock.yaml" || true
 
       - uses: actions/setup-node@v4
         with:
@@ -25,20 +38,35 @@ jobs:
           cache: npm
           cache-dependency-path: Frontend/package-lock.json
 
-      - run: npm ci || npm install
-      - env: { NODE_ENV: production }
-        run: npm run build
+      # Be tolerant of peer-dep conflicts (common on CI)
+      - name: Install deps
+        run: npm install --no-fund --no-audit --legacy-peer-deps
 
-      - name: Add build info file
+      # Build (print logs, fail clearly)
+      - name: Build
+        env: { NODE_ENV: production, CI: "false" } # avoid strict CI warnings killing the build
         run: |
-          echo "{\"app\":\"dream-frontend\",\"sha\":\"$GITHUB_SHA\",\"run_id\":\"$GITHUB_RUN_ID\",\"timestamp\":\"$(date -u +%FT%TZ)\"}" > Frontend/dist/build-info.json
+          echo "=== START BUILD ==="
+          npm run build
+          echo "=== END BUILD ==="
+          test -d dist || (echo "dist/ not created by build" && exit 1)
+
+      - name: Add build info
+        run: |
+          echo "{\"app\":\"dream-frontend\",\"sha\":\"$GITHUB_SHA\",\"run_id\":\"$GITHUB_RUN_ID\",\"ts\":\"$(date -u +%FT%TZ)\"}" > dist/build-info.json
+          ls -la dist | head
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Rsync dist -> server
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete --exclude="*.map"
+          switches: -avzr --delete
           path: Frontend/dist/
-          remote_path: /home/ubuntu/projects/dream/Frontend/dist/   # <-- Capital F (important)
+          remote_path: /home/ubuntu/projects/dream/Frontend/dist/   # Capital F
           remote_host: ${{ secrets.SERVER_HOST }}
           remote_user: ${{ secrets.SERVER_USER }}
           remote_key: ${{ secrets.SERVER_SSH_KEY }}

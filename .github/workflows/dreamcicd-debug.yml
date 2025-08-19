@@ -1,0 +1,68 @@
+name: Dream CI/CD – Debug
+
+on:
+  workflow_dispatch: {}   # Run manually from the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show runner info
+        run: |
+          uname -a
+          node -v || true
+          npm -v || true
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: SSH smoke test (write a probe file on server)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            echo "SSH_OK"
+            whoami && hostname
+            mkdir -p /home/ubuntu/projects/dream/_probe
+            date -u +"%FT%TZ" | tee /home/ubuntu/projects/dream/_probe/ssh.txt
+            ls -la /home/ubuntu/projects/dream | head
+
+      - name: Prepare local probe for rsync
+        run: |
+          mkdir -p probe
+          echo "hello-from-github-actions $(date -u +%FT%TZ)" > probe/from_runner.txt
+          ls -la probe
+
+      - name: Rsync probe -> server
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete
+          path: probe/
+          remote_path: /home/ubuntu/projects/dream/_probe/rsync/
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Verify files exist on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            echo "LISTING /home/ubuntu/projects/dream/_probe"
+            ls -la /home/ubuntu/projects/dream/_probe
+            echo "LISTING /home/ubuntu/projects/dream/_probe/rsync"
+            ls -la /home/ubuntu/projects/dream/_probe/rsync

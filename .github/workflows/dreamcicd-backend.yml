@@ -4,19 +4,25 @@ on:
   push:
     branches: [ main ]
     paths: [ 'Backend/**', '.github/workflows/dreamcicd-backend.yml' ]
-  workflow_dispatch: {}   # manual run / rollback
+  workflow_dispatch: {}
 
 concurrency:
   group: dream-backend
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  cd:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Rsync Backend -> server
         uses: burnett01/rsync-deployments@6.0.0
@@ -28,22 +34,33 @@ jobs:
           remote_user: ${{ secrets.SERVER_USER }}
           remote_key: ${{ secrets.SERVER_SSH_KEY }}
 
-      - name: Install deps & PM2 reload (dream apps only)
+      - name: Install deps & PM2 reload (dream services only)
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            set -e
+            set -euo pipefail
             cd /home/ubuntu/projects/dream/Backend
+
+            # Install deps for each dream service (tolerant of peer-deps)
             for svc in gateway-service auth-service dispute-service settings-service template-service external-api-services; do
-              [ -f "./$svc/package.json" ] || continue
-              (cd "$svc" && (npm ci --omit=dev || npm install --omit=dev))
+              if [ -f "./$svc/package.json" ]; then
+                echo "Installing in $svc"
+                (cd "$svc" && npm install --no-fund --no-audit --omit=dev --legacy-peer-deps)
+              fi
             done
-            pm2 startOrReload /home/ubuntu/projects/dream/Backend/dream-ecosystem.config.js --env production
+
+            # Reload only your dream-* apps from ecosystem
+            pm2 startOrReload /home/ubuntu/projects/dream/Backend/dream-ecosystem.config.js --env production --only "dream-gateway-service,dream-auth-service,dream-dispute-service,dream-settings-service,dream-template-service,dream-external-api-services"
             pm2 save
-            # Build info for traceability
+
+            # Write build info
             cat > /home/ubuntu/projects/dream/Backend/BUILD_INFO.json <<'JSON'
-            { "app":"dream-backend","sha":"${{ github.sha }}","run_id":"${{ github.run_id }}","actor":"${{ github.actor }}","timestamp":"${{ github.run_started_at }}" }
+            { "app":"dream-backend",
+              "sha":"${{ github.sha }}",
+              "run_id":"${{ github.run_id }}",
+              "actor":"${{ github.actor }}",
+              "timestamp":"${{ github.run_started_at }}" }
             JSON
