@@ -1699,7 +1699,224 @@ exports.createDispute = async (req, res) => {
 
     console.log(`?? Found ${assignees.length} assignee(s): ${assignees.join(', ')}`);
 
-    // 8) ?? FIX: Persist assignment for ALL assignees, not just the first one
+    // ?? AUTO-APPROVAL LOGIC: Check if dispute creator is assigned to first action node
+    const shouldAutoApprove = assignees.includes(created_by);
+    
+    if (shouldAutoApprove) {
+      console.log(`?? AUTO-APPROVAL: Dispute creator ${created_by} is assigned to first action node. Auto-approving and moving to next step.`);
+      
+      // Get outgoing edges from current node to find next step
+      const outgoingEdges = edges.filter(e => e.source_node_id === nextNodeId);
+      const forwardEdge = outgoingEdges.find(e => 
+        (e.direction || e.label || '').toLowerCase() === 'forward'
+      );
+      
+      if (forwardEdge) {
+        // Run workflow engine with auto-approval to get the next assignee
+        const autoApprovalPayload = {
+          currentNodeId: String(nextNodeId),
+          decision: 'forward',
+          action: 'process'
+        };
+        
+        const { nextNode: autoNextNode, log: autoLog } = await runWorkflowEngine({ nodes, edges }, autoApprovalPayload);
+        
+        console.log(`?? AUTO-APPROVAL ENGINE LOG:`, autoLog);
+        
+        if (autoNextNode && autoNextNode.type === 'action') {
+          // Get the next node's assignment info
+          const [nextNd] = await sequelize.query(
+            `SELECT wn.action_user_id, wn.json_node, COALESCE(wf.type,'role') AS work_flow_type
+             FROM work_flow_nodes wn JOIN work_flows wf ON wn.work_flow_id = wf.id
+             WHERE wn.work_flow_id = :wf AND wn.node_id = :node`,
+            { 
+              replacements: { wf: work_flow_id, node: autoNextNode.id }, 
+              type: sequelize.QueryTypes.SELECT, 
+              transaction: t 
+            }
+          );
+          
+          if (nextNd) {
+            let nextFinalActionUserId = nextNd.action_user_id;
+            if ((!nextFinalActionUserId || nextFinalActionUserId.toString().trim() === '') && nextNd.json_node) {
+              try {
+                const jsonData = JSON.parse(nextNd.json_node);
+                if (jsonData.action_user_id) {
+                  nextFinalActionUserId = jsonData.action_user_id;
+                }
+              } catch (e) {
+                console.warn(`?? Auto-approval: Could not parse json_node for next node ${autoNextNode.id}:`, e.message);
+              }
+            }
+            
+            const nextAssignees = await resolveAssignees({
+              work_flow_type: nextNd.work_flow_type,
+              action_user_id: nextFinalActionUserId,
+              org_code,
+              created_by,
+              originalCreator: created_by
+            });
+            
+            const nextNextStage = await getMeaningfulStageName(
+              autoNextNode.data, 
+              nextNd, 
+              org_code, 
+              t
+            );
+            
+            console.log(`?? AUTO-APPROVAL: Moving to next node ${autoNextNode.id}, assigning to: ${nextAssignees.join(', ')}`);
+            
+            // Record the auto-approval in history for the original node
+            await sequelize.query(
+              `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, updated_at, updated_by, node_decision, comments)
+               VALUES(?, ?, ?, ?, ?, 'auto_approved', ?, NOW(), true, NOW(), ?, 'forward', 'Auto-approved by dispute creator')`,
+              { 
+                replacements: [dispute_id, created_by, created_by, created_by, nextNodeId, nextStage, created_by], 
+                transaction: t 
+              }
+            );
+            
+            // Assign to the next node instead
+            const assignmentPromises = [];
+            const historyPromises = [];
+            
+            for (const assignee of nextAssignees) {
+              assignmentPromises.push(
+                sequelize.query(
+                  `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at)
+                   VALUES(?, ?, ?, ?, ?, NOW())`,
+                  { 
+                    replacements: [dispute_id, assignee, autoNextNode.id, nextNextStage, created_by], 
+                    transaction: t 
+                  }
+                )
+              );
+
+              historyPromises.push(
+                sequelize.query(
+                  `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status)
+                   VALUES(?, ?, ?, ?, ?, 'created', ?, NOW(), true)`,
+                  { 
+                    replacements: [dispute_id, created_by, created_by, assignee, autoNextNode.id, nextNextStage], 
+                    transaction: t 
+                  }
+                )
+              );
+            }
+            
+            await Promise.all([...assignmentPromises, ...historyPromises]);
+            await t.commit();
+            
+            const disputeData = {
+              priority,
+              severity,
+              description,
+              comments
+            };
+            
+            // Audit log for auto-approved dispute
+            try {
+              await logAudit({
+                org_code,
+                object_type: "disputes",
+                object_id: dispute_id,
+                action: "CREATE_AUTO_APPROVED",
+                changed_by: created_by,
+                old_values: null,
+                new_values: {
+                  dispute_id,
+                  work_flow_id,
+                  template_id,
+                  template_type,
+                  dispute_type,
+                  priority,
+                  severity,
+                  description,
+                  dispute_amount: getAmount,
+                  created_by,
+                  assignees: nextAssignees,
+                  nextStage: nextNextStage,
+                  licence_type,
+                  dream_lite_source_data: dream_lite_source_data ? JSON.stringify(dream_lite_source_data) : null,
+                  dream_lite_modified_data: dream_lite_modified_data ? JSON.stringify(dream_lite_modified_data) : null
+                },
+                remarks: `Dispute created with auto-approval and assigned to ${nextAssignees.length} user(s): ${nextAssignees.join(', ')}`
+              });
+            } catch (auditErr) {
+              console.warn('Audit logging failed for auto-approved dispute creation:', auditErr.message);
+            }
+            
+            sendDisputeNotifications({
+              type: 'CREATE',
+              dispute_id,
+              org_code,
+              assignees: nextAssignees,
+              created_by,
+              disputeData,
+              nextStage: nextNextStage,
+              sequelize
+            }).catch(err => {
+              console.error(`Error sending notifications for dispute #${dispute_id}:`, err);
+            });
+            
+            console.log(`? Successfully created dispute ${dispute_id} with auto-approval and assigned to ${nextAssignees.length} users: ${nextAssignees.join(', ')} at node ${autoNextNode.id}`);
+            
+            return res.status(201).json({ 
+              status: true, 
+              dispute_id, 
+              assigned_to: nextAssignees,
+              assignee_count: nextAssignees.length,
+              nextStage: nextNextStage,
+              auto_approved: true,
+              debug: {
+                stoppedAtNode: autoNextNode.id,
+                nodeType: autoNextNode.type,
+                engineLog: log,
+                autoApprovalLog: autoLog,
+                skippedNode: nextNodeId
+              }
+            });
+          }
+        } else if (autoNextNode && (autoNextNode.type === 'end' || autoNextNode.data?.is_end === true)) {
+          // Auto-approval led directly to resolution
+          await sequelize.query(
+            `UPDATE disputes SET dispute_stage = 'resolved', updated_at = NOW(), updated_by = :by WHERE id = :id`,
+            { replacements: { by: created_by, id: dispute_id }, transaction: t }
+          );
+          
+          await sequelize.query(
+            `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, updated_at, updated_by, node_decision, comments)
+             VALUES(?, ?, ?, ?, ?, 'auto_resolved', 'resolved', NOW(), true, NOW(), ?, 'forward', 'Auto-approved and resolved by dispute creator')`,
+            { 
+              replacements: [dispute_id, created_by, created_by, created_by, nextNodeId, created_by], 
+              transaction: t 
+            }
+          );
+          
+          await t.commit();
+          
+          return res.status(201).json({ 
+            status: true, 
+            dispute_id, 
+            assigned_to: null, 
+            isComplete: true,
+            auto_approved: true,
+            auto_resolved: true,
+            debug: {
+              stoppedAtNode: autoNextNode.id,
+              nodeType: autoNextNode.type,
+              engineLog: log,
+              autoApprovalLog: autoLog
+            }
+          });
+        }
+      }
+      
+      // Fallback: if auto-approval logic fails, continue with normal assignment but log the attempt
+      console.warn(`?? AUTO-APPROVAL: Failed to auto-approve, falling back to normal assignment`);
+    }
+
+    // 8) Normal assignment logic (when no auto-approval needed or as fallback)
     const assignmentPromises = [];
     const historyPromises = [];
     
@@ -1788,6 +2005,7 @@ exports.createDispute = async (req, res) => {
       assigned_to: assignees, // ?? Return all assignees, not just the first one
       assignee_count: assignees.length,
       nextStage,
+      auto_approved: false,
       debug: {
         stoppedAtNode: nextNodeId,
         nodeType: nextNode.type,
@@ -2242,7 +2460,172 @@ exports.createDreamLiteDispute = async (req, res) => {
 
     console.log(`?? Found ${assignees.length} assignee(s): ${assignees.join(', ')}`);
 
-    // 9) ?? Persist assignment for ALL assignees - SAME pattern as createDispute
+    // ?? AUTO-APPROVAL LOGIC: Check if dispute creator is assigned to first action node
+    const shouldAutoApprove = assignees.includes(created_by);
+    
+    if (shouldAutoApprove) {
+      console.log(`?? AUTO-APPROVAL: Dispute creator ${created_by} is assigned to first action node. Auto-approving and moving to next step.`);
+      
+      // Get outgoing edges from current node to find next step
+      const outgoingEdges = edges.filter(e => e.source_node_id === nextNodeId);
+      const forwardEdge = outgoingEdges.find(e => 
+        (e.direction || e.label || '').toLowerCase() === 'forward'
+      );
+      
+      if (forwardEdge) {
+        // Run workflow engine with auto-approval to get the next assignee
+        const autoApprovalPayload = {
+          currentNodeId: String(nextNodeId),
+          decision: 'forward',
+          action: 'process'
+        };
+        
+        const { nextNode: autoNextNode, log: autoLog } = await runWorkflowEngine({ nodes, edges }, autoApprovalPayload);
+        
+        console.log(`?? AUTO-APPROVAL ENGINE LOG:`, autoLog);
+        
+        if (autoNextNode && autoNextNode.type === 'action') {
+          // Get the next node's assignment info
+          const [nextNd] = await sequelize.query(
+            `SELECT wn.action_user_id, wn.json_node, COALESCE(wf.type,'role') AS work_flow_type
+             FROM work_flow_nodes wn JOIN work_flows wf ON wn.work_flow_id = wf.id
+             WHERE wn.work_flow_id = :wf AND wn.node_id = :node`,
+            { 
+              replacements: { wf: processedWorkFlowId, node: autoNextNode.id }, 
+              type: sequelize.QueryTypes.SELECT, 
+              transaction: t 
+            }
+          );
+          
+          if (nextNd) {
+            let nextFinalActionUserId = nextNd.action_user_id;
+            if ((!nextFinalActionUserId || nextFinalActionUserId.toString().trim() === '') && nextNd.json_node) {
+              try {
+                const jsonData = JSON.parse(nextNd.json_node);
+                if (jsonData.action_user_id) {
+                  nextFinalActionUserId = jsonData.action_user_id;
+                }
+              } catch (e) {
+                console.warn(`?? Auto-approval: Could not parse json_node for next node ${autoNextNode.id}:`, e.message);
+              }
+            }
+            
+            const nextAssignees = await resolveAssignees({
+              work_flow_type: nextNd.work_flow_type,
+              action_user_id: nextFinalActionUserId,
+              org_code,
+              created_by,
+              originalCreator: created_by
+            });
+            
+            const nextNextStage = await getMeaningfulStageName(
+              autoNextNode.data, 
+              nextNd, 
+              org_code, 
+              t
+            );
+            
+            console.log(`?? AUTO-APPROVAL: Moving to next node ${autoNextNode.id}, assigning to: ${nextAssignees.join(', ')}`);
+            
+            // Record the auto-approval in history for the original node
+            await sequelize.query(
+              `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, updated_at, updated_by, node_decision, comments)
+               VALUES(?, ?, ?, ?, ?, 'auto_approved', ?, NOW(), true, NOW(), ?, 'forward', 'Auto-approved by dispute creator')`,
+              { 
+                replacements: [dispute_id, created_by, created_by, created_by, nextNodeId, nextStage, created_by], 
+                transaction: t 
+              }
+            );
+            
+            // Assign to the next node instead
+            const assignmentPromises = [];
+            const historyPromises = [];
+            
+            for (const assignee of nextAssignees) {
+              assignmentPromises.push(
+                sequelize.query(
+                  `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at)
+                   VALUES(?, ?, ?, ?, ?, NOW())`,
+                  { 
+                    replacements: [dispute_id, assignee, autoNextNode.id, nextNextStage, created_by], 
+                    transaction: t 
+                  }
+                )
+              );
+
+              historyPromises.push(
+                sequelize.query(
+                  `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status)
+                   VALUES(?, ?, ?, ?, ?, 'created', ?, NOW(), true)`,
+                  { 
+                    replacements: [dispute_id, created_by, created_by, assignee, autoNextNode.id, nextNextStage], 
+                    transaction: t 
+                  }
+                )
+              );
+            }
+            
+            await Promise.all([...assignmentPromises, ...historyPromises]);
+            await t.commit();
+            
+            console.log(`? Successfully created DreamLite dispute ${dispute_id} with auto-approval and assigned to ${nextAssignees.length} users: ${nextAssignees.join(', ')} at node ${autoNextNode.id}`);
+            
+            return res.status(201).json({ 
+              status: true, 
+              dispute_id, 
+              assigned_to: nextAssignees,
+              assignee_count: nextAssignees.length,
+              nextStage: nextNextStage,
+              auto_approved: true,
+              debug: {
+                stoppedAtNode: autoNextNode.id,
+                nodeType: autoNextNode.type,
+                engineLog: log,
+                autoApprovalLog: autoLog,
+                skippedNode: nextNodeId
+              }
+            });
+          }
+        } else if (autoNextNode && (autoNextNode.type === 'end' || autoNextNode.data?.is_end === true)) {
+          // Auto-approval led directly to resolution
+          await sequelize.query(
+            `UPDATE disputes SET dispute_stage = 'resolved', updated_at = NOW(), updated_by = :by WHERE id = :id`,
+            { replacements: { by: created_by, id: dispute_id }, transaction: t }
+          );
+          
+          await sequelize.query(
+            `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, updated_at, updated_by, node_decision, comments)
+             VALUES(?, ?, ?, ?, ?, 'auto_resolved', 'resolved', NOW(), true, NOW(), ?, 'forward', 'Auto-approved and resolved by dispute creator')`,
+            { 
+              replacements: [dispute_id, created_by, created_by, created_by, nextNodeId, created_by], 
+              transaction: t 
+            }
+          );
+          
+          await t.commit();
+          
+          return res.status(201).json({ 
+            status: true, 
+            dispute_id, 
+            assigned_to: null, 
+            isComplete: true,
+            auto_approved: true,
+            auto_resolved: true,
+            debug: {
+              stoppedAtNode: autoNextNode.id,
+              nodeType: autoNextNode.type,
+              engineLog: log,
+              autoApprovalLog: autoLog
+            }
+          });
+        }
+      }
+      
+      // Fallback: if auto-approval logic fails, continue with normal assignment but log the attempt
+      console.warn(`?? AUTO-APPROVAL: Failed to auto-approve, falling back to normal assignment`);
+    }
+
+    // 9) Normal assignment logic (when no auto-approval needed or as fallback)
     const assignmentPromises = [];
     const historyPromises = [];
     
@@ -2277,7 +2660,7 @@ exports.createDreamLiteDispute = async (req, res) => {
 
     await t.commit();
 
-     const disputeData = {
+    const disputeData = {
       priority,
       severity,
       description,
@@ -2315,7 +2698,7 @@ exports.createDreamLiteDispute = async (req, res) => {
     }
 
     // Send notifications asynchronously (don't await)
-   sendDisputeNotifications({
+    sendDisputeNotifications({
       type: 'DREAMLITE_CREATE',
       dispute_id,
       org_code,
@@ -2336,6 +2719,7 @@ exports.createDreamLiteDispute = async (req, res) => {
       assigned_to: assignees, // Return all assignees, not just the first one
       assignee_count: assignees.length,
       nextStage,
+      auto_approved: false,
       debug: {
         stoppedAtNode: nextNodeId,
         nodeType: nextNode.type,

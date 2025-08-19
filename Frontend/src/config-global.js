@@ -9,6 +9,7 @@ export const CONFIG = {
     name: 'DREAM',
     // serverUrl: import.meta.env.VITE_SERVER_URL ?? 'http://3.15.29.232:4000',
     // serverUrl: import.meta.env.VITE_SERVER_URL ?? 'http://localhost:4000',
+    // serverUrl: import.meta.env.VITE_SERVER_URL ?? 'http://localhost:4020',
     // serverUrl: import.meta.env.VITE_SERVER_URL ?? 'http://52.203.77.78:4000',
     serverUrl: import.meta.env.VITE_SERVER_URL ?? 'https://dream.uniflo.ai/api',
     assetURL: import.meta.env.VITE_ASSET_URL ?? '',
