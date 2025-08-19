@@ -155,7 +155,10 @@ export function CreateTemplates() {
         });
     }
     if (item === 'work_flows') {
-      postService(endpoints.auth.getWorkDropDown, 'POST', { search_key: '' })
+      postService(endpoints.auth.getWorkDropDown, 'POST', { 
+        search_key: '',
+        org_code: userData.organization 
+      })
         .then((res) => {
           if (res.data.length > 0) {
             setWorkFlowDrop([...res.data]);

@@ -248,15 +248,35 @@ exports.getWorkFlowList = async (req, res) => {
 exports.getWorkDropDown = async (req, res) => {
   try {
     const { search_key } = req.query;
+    const { org_code } = req.body; // Get org_code from request body
     
-    let query = `SELECT id, name FROM work_flows WHERE status=false AND work_flow_status='2' order by name`;
+    // Modified query to show only the most recent workflow for each unique name
+    // This will help avoid showing multiple "Copy" versions of the same workflow
+    // Also filter by org_code for data isolation
+    let query = `
+      SELECT wf.id, wf.name 
+      FROM work_flows wf
+      WHERE wf.status = false 
+        AND wf.work_flow_status = '2'
+        AND wf.org_code = ?
+        AND wf.id = (
+          SELECT MAX(wf2.id) 
+          FROM work_flows wf2 
+          WHERE wf2.name = wf.name 
+            AND wf2.status = false 
+            AND wf2.work_flow_status = '2'
+            AND wf2.org_code = ?
+        )
+    `;
 
-    let replacements = [];
+    let replacements = [org_code, org_code]; // Add org_code to replacements twice for both WHERE clauses
 
     if (search_key) {
-      query += ' AND name LIKE ?';
+      query += ' AND wf.name LIKE ?';
       replacements.push(`%${search_key}%`);
     }
+    
+    query += ' ORDER BY wf.name';
     
     const getWorkDropDown = await sequelize.query(query, {
       type: sequelize.QueryTypes.SELECT,
@@ -265,7 +285,7 @@ exports.getWorkDropDown = async (req, res) => {
 
     res.status(200).json({ data: getWorkDropDown });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching templates', error: error.message });
+    res.status(500).json({ message: 'Error fetching workflows', error: error.message });
   }
 };
 

@@ -434,6 +434,7 @@ exports.getDreamLiteDisputeList = async (req, res) => {
         WHERE dh.dispute_id = disp.id
           AND dh.updated_at IS NULL
           AND dh.assigned_to IS NOT NULL
+          AND dh.action != 'smart_auto_approved'
       ) AS ph ON TRUE
       WHERE disp.licence_type = 'DREAMLTE'
         AND disp.org_code    = :org_code
@@ -870,12 +871,23 @@ exports.getPendingDreamLTEDisputesList = async (req, res) => {
       and a.assigned_to= :user_id 
       and a.updated_at is null
       and a.assigned_to IS NOT NULL
+      and a.action != 'smart_auto_approved'
     GROUP BY b.id, a.node_id) sub on main.dispute_id = sub.sub_dispute_id 
     ORDER BY main.dispute_date DESC,main.dispute_id desc`;
+    
     const result = await sequelize.query(query, {
       type: sequelize.QueryTypes.SELECT,
       replacements,
     });
+    
+    // Process result to extract only filename from capture_image paths
+    const path = require('path');
+    result.forEach(row => {
+      if (row.capture_image) {
+        row.capture_image = path.basename(row.capture_image);
+      }
+    });
+    
     return res.status(200).json({ data: result });
   } catch (error) {
     return res.status(500).json({status: false, message: "Error while getting pending disputes list", });
@@ -972,7 +984,10 @@ exports.updateDispute = async (req, res) => {
 
     if (!rows.length) {
       await t.rollback();
-      return res.status(400).json({ status: false, message: "No active node to process" });
+      return res.status(400).json({ 
+        status: false, 
+        message: "This dispute cannot be processed right now. Please contact your administrator for assistance."
+      });
     }
 
     const currentNodeId = rows[0].node_id;
@@ -1069,6 +1084,49 @@ exports.updateDispute = async (req, res) => {
 
     console.log(`?? Total workflow: ${nodes.length} nodes, ${edges.length} edges`);
     
+    // ?? REJECTION VALIDATION: Check if rejection is allowed in this workflow
+    if (decision && (decision.toLowerCase() === 'rejected' || decision.toLowerCase() === 'reject')) {
+      console.log(`?? REJECTION VALIDATION: Checking if rejection paths exist in workflow`);
+      
+      // Check if there are any rejection edges in the entire workflow
+      const rejectionEdges = edges.filter(e => {
+        const direction = (e.direction || e.label || '').toLowerCase();
+        return direction.includes('reject') || 
+               direction.includes('return') || 
+               direction.includes('back') ||
+               direction === 'no';
+      });
+      
+      console.log(`?? Found ${rejectionEdges.length} rejection-related edges in workflow:`, 
+        rejectionEdges.map(e => ({ source: e.source_node_id, target: e.destination_node_id, direction: e.direction || e.label })));
+      
+      // Also check if current node has rejection paths
+      const currentNodeRejectionEdges = edges.filter(e => 
+        (e.source_node_id || e.source) == currentNodeId && 
+        ['rejected', 'reject', 'return', 'back', 'no'].includes((e.direction || e.label || '').toLowerCase())
+      );
+      
+      console.log(`?? Current node ${currentNodeId} has ${currentNodeRejectionEdges.length} rejection edges`);
+      
+      if (rejectionEdges.length === 0) {
+        await t.rollback();
+        return res.status(400).json({
+          status: false,
+          message: "You cannot reject this dispute. Please approve it or contact your administrator."
+        });
+      }
+      
+      if (currentNodeRejectionEdges.length === 0) {
+        await t.rollback();
+        return res.status(400).json({
+          status: false,
+          message: "You cannot reject at this step. Please approve or contact your administrator."
+        });
+      }
+      
+      console.log(`?? REJECTION VALIDATION: Rejection is allowed, proceeding...`);
+    }
+    
     // Log the decision matching process
     console.log(`?? Looking for edges with direction matching: "${decision.toLowerCase()}"`);
     const matchingEdges = edges.filter(e => 
@@ -1131,9 +1189,22 @@ exports.updateDispute = async (req, res) => {
     if (shouldResolve) {
       console.log(`?? RESOLVING DISPUTE - Engine reached end node: ${nextNode.id} (${nextNode.data?.label})`);
       
+      // Determine final status based on decision path
+      let finalStatus = 'resolved';
+      let statusMessage = 'Dispute resolved';
+      
+      // Check if this resolution came from a rejection path
+      if (decision && (decision.toLowerCase() === 'rejected' || decision.toLowerCase() === 'reject')) {
+        finalStatus = 'rejected';
+        statusMessage = 'Dispute rejected';
+        console.log(`?? REJECTION PATH: Setting status to 'rejected' based on decision: ${decision}`);
+      } else {
+        console.log(`?? APPROVAL PATH: Setting status to 'resolved' based on decision: ${decision || 'approved'}`);
+      }
+      
       await sequelize.query(
-        `UPDATE disputes SET dispute_stage = 'resolved', updated_at = NOW(), updated_by = :by WHERE id = :id`,
-        { replacements: { by: done_by, id: dispute_id }, transaction: t, type: sequelize.QueryTypes.UPDATE }
+        `UPDATE disputes SET dispute_stage = :status, updated_at = NOW(), updated_by = :by WHERE id = :id`,
+        { replacements: { status: finalStatus, by: done_by, id: dispute_id }, transaction: t, type: sequelize.QueryTypes.UPDATE }
       );
       
       await t.commit();
@@ -1182,12 +1253,14 @@ exports.updateDispute = async (req, res) => {
 
       return res.json({
         status: true,
-        message: "Dispute resolved",
+        message: statusMessage,
         isComplete: true,
+        finalStatus: finalStatus,
         debug: {
           currentNode: { id: currentNodeId, type: currentNodeType },
           nextNode: { id: nextNode.id, type: nextNode.type, label: nextNode.data?.label },
           decision: decision,
+          finalStatus: finalStatus,
           engineLog: log
         }
       });
@@ -1350,15 +1423,13 @@ exports.updateDispute = async (req, res) => {
 
 	for (const assignee of assignees) {
 	  // Insert into dispute_flow for each assignee (unchanged)
-	  assignmentPromises.push(
+	      assignmentPromises.push(
 		sequelize.query(
-		  `INSERT INTO dispute_flow (dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at)
-		   VALUES (?, ?, ?, ?, ?, NOW())`,
+		  `INSERT INTO dispute_flow (dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at, status)
+		   VALUES (?, ?, ?, ?, ?, NOW(), true)`,
 		  { replacements: [dispute_id, assignee, nextNodeId, nextStage, done_by], transaction: t }
 		)
-	  );
-
-	  // Determine appropriate action based on transition info and decision
+	  );	  // Determine appropriate action based on transition info and decision
 	  let actionType = 'transition';
 	  
 	  if (transitionInfo.type === 'return' && 
@@ -1699,6 +1770,131 @@ exports.createDispute = async (req, res) => {
 
     console.log(`?? Found ${assignees.length} assignee(s): ${assignees.join(', ')}`);
 
+    // ?? SMART WORKFLOW POSITIONING: Check if creator should skip levels or start elsewhere
+    const smartPosition = await findSmartWorkflowPosition({
+      created_by,
+      workflow_nodes: nodes,
+      workflow_edges: edges,
+      org_code,
+      current_node_id: nextNodeId,
+      template_id
+    });
+
+    console.log(`?? Smart Workflow Analysis:`, smartPosition);
+
+    if (smartPosition.shouldSkip) {
+      console.log(`?? SMART SKIP: Moving dispute to appropriate level based on creator's position`);
+      
+      // Use the smart positioning to determine the right starting point
+      const smartNodeId = smartPosition.targetNode.node_id;
+      
+      // Get assignment info for the smart target node
+      const [smartNd] = await sequelize.query(
+        `SELECT wn.action_user_id, wn.json_node, COALESCE(wf.type,'role') AS work_flow_type
+         FROM work_flow_nodes wn JOIN work_flows wf ON wn.work_flow_id = wf.id
+         WHERE wn.work_flow_id = :wf AND wn.node_id = :node`,
+        { 
+          replacements: { wf: work_flow_id, node: smartNodeId }, 
+          type: sequelize.QueryTypes.SELECT, 
+          transaction: t 
+        }
+      );
+      
+      if (smartNd) {
+        let smartActionUserId = smartNd.action_user_id;
+        if ((!smartActionUserId || smartActionUserId.toString().trim() === '') && smartNd.json_node) {
+          try {
+            const jsonData = JSON.parse(smartNd.json_node);
+            if (jsonData.action_user_id) {
+              smartActionUserId = jsonData.action_user_id;
+            }
+          } catch (e) {
+            console.warn(`?? Smart positioning: Could not parse json_node for smart node ${smartNodeId}:`, e.message);
+          }
+        }
+        
+        const smartAssignees = await resolveAssignees({
+          work_flow_type: smartNd.work_flow_type,
+          action_user_id: smartActionUserId,
+          org_code,
+          created_by,
+          originalCreator: created_by
+        });
+        
+        const smartStage = await getMeaningfulStageName(
+          smartPosition.targetNode.data || {},
+          smartNd,
+          org_code,
+          t
+        );
+        
+        console.log(`?? SMART POSITIONING: Assigning to ${smartAssignees.join(', ')} at smart node ${smartNodeId}`);
+        
+        // Record the smart positioning in history
+        await sequelize.query(
+          `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, node_decision, comments)
+           VALUES(?, ?, ?, ?, ?, 'smart_positioned', ?, NOW(), true, 'smart_skip', ?)`,
+          { 
+            replacements: [
+              dispute_id, created_by, created_by, created_by, 
+              nextNodeId, nextStage, smartPosition.reason
+            ], 
+            transaction: t 
+          }
+        );
+        
+        // Assign to the smart node
+        const assignmentPromises = [];
+        const historyPromises = [];
+        
+        for (const assignee of smartAssignees) {
+          assignmentPromises.push(
+            sequelize.query(
+              `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at)
+               VALUES(?, ?, ?, ?, ?, NOW())`,
+              { 
+                replacements: [dispute_id, assignee, smartNodeId, smartStage, created_by], 
+                transaction: t 
+              }
+            )
+          );
+
+          historyPromises.push(
+            sequelize.query(
+              `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status)
+               VALUES(?, ?, ?, ?, ?, 'created', ?, NOW(), true)`,
+              { 
+                replacements: [dispute_id, created_by, created_by, assignee, smartNodeId, smartStage], 
+                transaction: t 
+              }
+            )
+          );
+        }
+        
+        await Promise.all([...assignmentPromises, ...historyPromises]);
+        await t.commit();
+        
+        console.log(`? Successfully created dispute ${dispute_id} with smart positioning and assigned to ${smartAssignees.length} users: ${smartAssignees.join(', ')} at smart node ${smartNodeId}`);
+        
+        return res.status(201).json({ 
+          status: true, 
+          dispute_id, 
+          assigned_to: smartAssignees,
+          assignee_count: smartAssignees.length,
+          nextStage: smartStage,
+          smart_positioned: true,
+          positioning_reason: smartPosition.reason,
+          debug: {
+            stoppedAtNode: smartNodeId,
+            nodeType: 'action',
+            engineLog: log,
+            smartPositioning: smartPosition,
+            originalNode: nextNodeId
+          }
+        });
+      }
+    }
+
     // ?? AUTO-APPROVAL LOGIC: Check if dispute creator is assigned to first action node
     const shouldAutoApprove = assignees.includes(created_by);
     
@@ -2006,6 +2202,7 @@ exports.createDispute = async (req, res) => {
       assignee_count: assignees.length,
       nextStage,
       auto_approved: false,
+      smart_positioned: false,
       debug: {
         stoppedAtNode: nextNodeId,
         nodeType: nextNode.type,
@@ -2177,8 +2374,257 @@ async function resolveAssignees({ work_flow_type, action_user_id, org_code, crea
   console.log(`? Final hierarchy assignees: ${assignees.join(', ')}`);
   return assignees;
 }
+    case 'smartrouting': {
+      console.log(`?? Processing smart routing assignment for region/department/role: "${action_user_id}", org_code: ${org_code}`);
+      
+      // Smart routing can be region, department, or role-based
+      // action_user_id contains the specific region/department/role value
+      if (!action_user_id || action_user_id.toString().trim() === '') {
+        throw new Error('Smart routing requires a valid region, department, or role value');
+      }
+      
+      const routingValue = action_user_id.toString().trim();
+      
+      // Try to find users by region first
+      let smartUsers = await sequelize.query(
+        `SELECT emp_id AS user_id FROM users 
+         WHERE region = :routing_value AND org_code = :org_code AND status = true`,
+        {
+          replacements: { routing_value: routingValue, org_code },
+          type: sequelize.QueryTypes.SELECT
+        }
+      );
+      
+      // If no users found by region, try department
+      if (smartUsers.length === 0) {
+        smartUsers = await sequelize.query(
+          `SELECT emp_id AS user_id FROM users 
+           WHERE department = :routing_value AND org_code = :org_code AND status = true`,
+          {
+            replacements: { routing_value: routingValue, org_code },
+            type: sequelize.QueryTypes.SELECT
+          }
+        );
+      }
+      
+      // If no users found by department, try sub_region
+      if (smartUsers.length === 0) {
+        smartUsers = await sequelize.query(
+          `SELECT emp_id AS user_id FROM users 
+           WHERE sub_region = :routing_value AND org_code = :org_code AND status = true`,
+          {
+            replacements: { routing_value: routingValue, org_code },
+            type: sequelize.QueryTypes.SELECT
+          }
+        );
+      }
+      
+      // If still no users found, try as role
+      if (smartUsers.length === 0) {
+        smartUsers = await sequelize.query(
+          `SELECT emp_id AS user_id FROM users 
+           WHERE role = :routing_value AND org_code = :org_code AND status = true`,
+          {
+            replacements: { routing_value: routingValue, org_code },
+            type: sequelize.QueryTypes.SELECT
+          }
+        );
+      }
+      
+      if (smartUsers.length === 0) {
+        console.warn(`?? No users found for smart routing value: ${routingValue}`);
+        // Fallback to admin users
+        smartUsers = await sequelize.query(
+          `SELECT emp_id AS user_id FROM users 
+           WHERE reporting_to IS NULL AND org_code = :org_code AND status = true
+           LIMIT 1`,
+          {
+            replacements: { org_code },
+            type: sequelize.QueryTypes.SELECT
+          }
+        );
+      }
+      
+      const assigneeList = smartUsers.map(u => u.user_id);
+      console.log(`? Smart routing found ${assigneeList.length} assignees: ${assigneeList.join(', ')}`);
+      return assigneeList;
+    }
     default:
       throw new Error(`Unknown routing type "${work_flow_type}"`);
+  }
+}
+
+// Smart Workflow Positioning Function
+async function findSmartWorkflowPosition({
+  created_by,
+  workflow_nodes,
+  workflow_edges,
+  org_code,
+  current_node_id,
+  template_id
+}) {
+  try {
+    console.log(`?? Analyzing smart workflow position for creator: ${created_by}`);
+    console.log(`?? Workflow nodes:`, workflow_nodes.map(n => ({ 
+      id: n.node_id, 
+      type: n.type_node, 
+      assignee: n.action_user_id 
+    })));
+    
+    // 1. Find all action nodes and sort them by proper workflow sequence
+    let actionNodes = workflow_nodes.filter(n => n.type_node === 'action');
+    
+    // Better sorting: Use source_sl_no if available, otherwise try to determine sequence from edges
+    actionNodes.sort((a, b) => {
+      // Primary sort: source_sl_no (sequence number)
+      if (a.source_sl_no && b.source_sl_no) {
+        return a.source_sl_no - b.source_sl_no;
+      }
+      
+      // Fallback: Try to order based on workflow edges or creation order
+      // For now, use the node creation order as a reasonable proxy
+      const aTime = new Date(a.created_at || 0).getTime();
+      const bTime = new Date(b.created_at || 0).getTime();
+      return aTime - bTime;
+    });
+    
+    console.log(`?? Action nodes in proper workflow sequence:`, actionNodes.map((n, idx) => ({ 
+      sequence: idx,
+      id: n.node_id, 
+      assignee: n.action_user_id,
+      source_sl_no: n.source_sl_no,
+      label: n.label || n.name
+    })));
+    
+    // 2. Check if creator is directly assigned to any action node
+    const creatorNodeIndex = actionNodes.findIndex(node => 
+      node.action_user_id === created_by ||
+      (node.json_node && node.json_node.includes(created_by))
+    );
+    
+    if (creatorNodeIndex !== -1) {
+      const creatorNode = actionNodes[creatorNodeIndex];
+      console.log(`?? Creator ${created_by} found in workflow at sequence position: ${creatorNodeIndex}, node: ${creatorNode.node_id}, label: ${creatorNode.label || creatorNode.name}`);
+      
+      // If creator is found in workflow, skip to the NEXT level after their position
+      const nextNodeIndex = creatorNodeIndex + 1;
+      
+      if (nextNodeIndex < actionNodes.length) {
+        const targetNode = actionNodes[nextNodeIndex];
+        console.log(`?? Smart skip: Moving to next level after creator's position: ${targetNode.node_id}`);
+        
+        return {
+          shouldSkip: true,
+          targetNode: targetNode,
+          reason: `Creator ${created_by} is assigned to workflow node ${creatorNode.node_id}. Auto-approving their level and moving to next: ${targetNode.action_user_id}`,
+          skipType: 'creator_level_skip',
+          skippedLevels: creatorNodeIndex + 1, // Skip all levels up to and including creator's level
+          creatorNodeId: creatorNode.node_id
+        };
+      } else {
+        // Creator is at the last level - should auto-resolve or escalate
+        console.log(`?? Creator is at final approval level - should auto-resolve`);
+        return {
+          shouldSkip: true,
+          targetNode: null, // Will trigger auto-resolution
+          reason: `Creator ${created_by} is at the final approval level. Auto-resolving dispute.`,
+          skipType: 'auto_resolve',
+          skippedLevels: actionNodes.length,
+          creatorNodeId: creatorNode.node_id
+        };
+      }
+    }
+    
+    // 3. Check if creator's manager is in workflow (hierarchy analysis)
+    const [creatorInfo] = await sequelize.query(
+      `SELECT reporting_to, first_name, last_name FROM users 
+       WHERE emp_id = :emp_id AND org_code = :org_code AND status = true`,
+      { 
+        replacements: { emp_id: created_by, org_code },
+        type: sequelize.QueryTypes.SELECT 
+      }
+    );
+    
+    if (creatorInfo?.reporting_to) {
+      console.log(`?? Creator reports to: ${creatorInfo.reporting_to}`);
+      
+      const managerNodeIndex = actionNodes.findIndex(node => 
+        node.action_user_id === creatorInfo.reporting_to ||
+        (node.json_node && node.json_node.includes(creatorInfo.reporting_to))
+      );
+      
+      if (managerNodeIndex !== -1) {
+        const managerNode = actionNodes[managerNodeIndex];
+        console.log(`?? Creator's manager found in workflow at node: ${managerNode.node_id} (index: ${managerNodeIndex})`);
+        
+        // Start from manager's level since creator reports to them
+        return {
+          shouldSkip: true,
+          targetNode: managerNode,
+          reason: `Creator ${created_by} reports to ${creatorInfo.reporting_to} who is in workflow. Starting from manager level.`,
+          skipType: 'manager_level_start',
+          skippedLevels: managerNodeIndex,
+          managerNodeId: managerNode.node_id
+        };
+      }
+      
+      // 4. Walk up hierarchy to find workflow participant
+      let currentUser = creatorInfo.reporting_to;
+      let depth = 1;
+      
+      while (currentUser && depth <= 5) {
+        const hierarchyNodeIndex = actionNodes.findIndex(node => 
+          node.action_user_id === currentUser ||
+          (node.json_node && node.json_node.includes(currentUser))
+        );
+        
+        if (hierarchyNodeIndex !== -1) {
+          const hierarchyNode = actionNodes[hierarchyNodeIndex];
+          console.log(`?? Found workflow participant ${currentUser} at hierarchy depth ${depth}, node index ${hierarchyNodeIndex}`);
+          
+          // If creator's hierarchy suggests starting at different point
+          if (depth <= 3) { // Creator is reasonably close to workflow participant
+            return {
+              shouldSkip: true,
+              targetNode: hierarchyNode,
+              reason: `Creator reports through hierarchy to workflow participant ${currentUser}. Starting from appropriate level.`,
+              skipType: 'hierarchy_based',
+              skippedLevels: hierarchyNodeIndex,
+              hierarchyDepth: depth
+            };
+          }
+          break;
+        }
+        
+        const [nextLevel] = await sequelize.query(
+          `SELECT reporting_to FROM users WHERE emp_id = :emp_id AND org_code = :org_code`,
+          { 
+            replacements: { emp_id: currentUser, org_code },
+            type: sequelize.QueryTypes.SELECT 
+          }
+        );
+        
+        currentUser = nextLevel?.reporting_to;
+        depth++;
+      }
+    }
+    
+    // 5. No smart positioning needed - use normal flow
+    console.log(`?? No smart positioning applicable - using normal workflow flow`);
+    return {
+      shouldSkip: false,
+      reason: 'Creator not found in workflow hierarchy - using normal workflow flow',
+      skipType: 'none'
+    };
+    
+  } catch (error) {
+    console.error(`?? Error in smart workflow positioning:`, error);
+    return {
+      shouldSkip: false,
+      reason: 'Error in analysis - falling back to normal flow',
+      skipType: 'error',
+      error: error.message
+    };
   }
 }
 
@@ -2443,37 +2889,216 @@ exports.createDreamLiteDispute = async (req, res) => {
 
     console.log(`??? Setting initial stage as: "${nextStage}" (from node: "${nextNode.data?.label}", role: "${nd.action_user_id}")`);
 
-    // 8) Resolve assignees - SAME function as createDispute
+    // ?? SMART WORKFLOW POSITIONING: Check BEFORE resolving assignees to avoid duplicate assignments
+    const smartPosition = await findSmartWorkflowPosition({
+      created_by,
+      workflow_nodes: nodes,
+      workflow_edges: edges,
+      org_code,
+      current_node_id: nextNodeId,
+      template_id: processedTemplateId
+    });
+
+    console.log(`?? Smart Workflow Analysis:`, smartPosition);
+
+    if (smartPosition.shouldSkip) {
+      console.log(`?? SMART SKIP: Moving dispute to appropriate level based on creator's position`);
+      
+      // Use the smart positioning to determine the right starting point
+      const smartNodeId = smartPosition.targetNode.node_id;
+      
+      // Get assignment info for the smart target node
+      const [smartNd] = await sequelize.query(
+        `SELECT wn.action_user_id, wn.json_node, COALESCE(wf.type,'role') AS work_flow_type
+         FROM work_flow_nodes wn JOIN work_flows wf ON wn.work_flow_id = wf.id
+         WHERE wn.work_flow_id = :wf AND wn.node_id = :node`,
+        { 
+          replacements: { wf: processedWorkFlowId, node: smartNodeId }, 
+          type: sequelize.QueryTypes.SELECT, 
+          transaction: t 
+        }
+      );
+      
+      if (smartNd) {
+        let smartActionUserId = smartNd.action_user_id;
+        if ((!smartActionUserId || smartActionUserId.toString().trim() === '') && smartNd.json_node) {
+          try {
+            const jsonData = JSON.parse(smartNd.json_node);
+            if (jsonData.action_user_id) {
+              smartActionUserId = jsonData.action_user_id;
+            }
+          } catch (e) {
+            console.warn(`?? Smart positioning: Could not parse json_node for smart node ${smartNodeId}:`, e.message);
+          }
+        }
+        
+        const smartAssignees = await resolveAssignees({
+          work_flow_type: smartNd.work_flow_type,
+          action_user_id: smartActionUserId,
+          org_code,
+          created_by,
+          originalCreator: created_by
+        });
+        
+        const smartStage = await getMeaningfulStageName(
+          smartPosition.targetNode.data || {},
+          smartNd,
+          org_code,
+          t
+        );
+        
+        console.log(`?? SMART POSITIONING: Assigning to ${smartAssignees.join(', ')} at smart node ${smartNodeId}`);
+        
+        // ?? Check for auto-approval after smart positioning: If smart positioning was triggered because creator is in workflow, auto-approve
+        const shouldAutoApproveSmartPosition = smartPosition.skipType === 'creator_level_skip' || 
+                                               smartPosition.skipType === 'manager_level_start' ||
+                                               smartPosition.skipType === 'hierarchy_based';
+        
+        if (shouldAutoApproveSmartPosition) {
+          console.log(`?? SMART POSITION AUTO-APPROVAL: Creator ${created_by} found in workflow (${smartPosition.skipType}). Auto-approving their level and using smart positioned target.`);
+          
+          // Smart positioning already found the correct target - use it directly without running workflow engine again
+          try {
+            console.log(`?? SMART POSITION AUTO-APPROVAL: Using pre-calculated smart target ${smartNodeId} with assignees: ${smartAssignees.join(', ')}`);
+            
+            // Record the auto-approval for creator's level (the level they would have been assigned to originally)
+            await sequelize.query(
+              `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, node_decision, comments)
+               VALUES(?, ?, ?, ?, ?, 'smart_auto_approved', ?, NOW(), true, 'approved', ?)`,
+              { 
+                replacements: [
+                  dispute_id, created_by, created_by, created_by, 
+                  smartPosition.creatorNodeId || smartNodeId, smartStage, 
+                  `Creator found in workflow - auto-approved their level via smart positioning`
+                ], 
+                transaction: t 
+              }
+            );
+            
+            // Assign directly to the smart positioned target (Admin level)
+            for (const assignee of smartAssignees) {
+              await sequelize.query(
+                `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at, status)
+                 VALUES(?, ?, ?, ?, ?, NOW(), true)`,
+                { 
+                  replacements: [dispute_id, assignee, smartNodeId, smartStage, created_by], 
+                  transaction: t 
+                }
+              );
+
+              await sequelize.query(
+                `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status)
+                 VALUES(?, ?, ?, ?, ?, 'created', ?, NOW(), true)`,
+                { 
+                  replacements: [dispute_id, created_by, created_by, assignee, smartNodeId, smartStage], 
+                  transaction: t 
+                }
+              );
+            }
+            
+            await t.commit();
+            
+            console.log(`? Successfully created DreamLite dispute ${dispute_id} with smart positioning + auto-approval, assigned to ${smartAssignees.length} users: ${smartAssignees.join(', ')} at node ${smartNodeId}`);
+            
+            return res.status(201).json({ 
+              message: 'Dispute created successfully with smart positioning and auto-approval', 
+              dispute_id,
+              status: 'success',
+              positioning_reason: smartPosition.reason,
+              assignees: smartAssignees,
+              current_node: smartNodeId,
+              stage: smartStage,
+              smart_positioned: true,
+              auto_approved: true,
+              metadata: {
+                smartPositioning: smartPosition,
+                autoApproval: true,
+                skipReason: 'smart_positioned_auto_approved'
+              }
+            });
+            
+          } catch (autoError) {
+            console.error(`?? Error in smart position auto-approval:`, autoError);
+            // Fall through to normal smart assignment
+          }
+        }
+        
+        // If not auto-approved, do normal smart assignment
+        for (const assignee of smartAssignees) {
+          await sequelize.query(
+            `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at, status)
+             VALUES(?, ?, ?, ?, ?, NOW(), true)`,
+            { 
+              replacements: [dispute_id, assignee, smartNodeId, smartStage, created_by], 
+              transaction: t 
+            }
+          );
+
+          await sequelize.query(
+            `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status)
+             VALUES(?, ?, ?, ?, ?, 'created', ?, NOW(), true)`,
+            { 
+              replacements: [dispute_id, created_by, created_by, assignee, smartNodeId, smartStage], 
+              transaction: t 
+            }
+          );
+        }
+        
+        await t.commit();
+        
+        console.log(`? Successfully created DreamLite dispute ${dispute_id} with smart positioning and assigned to ${smartAssignees.length} users: ${smartAssignees.join(', ')} at smart node ${smartNodeId}`);
+        
+        return res.status(201).json({ 
+          status: true, 
+          dispute_id, 
+          assigned_to: smartAssignees,
+          assignee_count: smartAssignees.length,
+          nextStage: smartStage,
+          smart_positioned: true,
+          positioning_reason: smartPosition.reason,
+          debug: {
+            stoppedAtNode: smartNodeId,
+            nodeType: 'action',
+            engineLog: log,
+            smartPositioning: smartPosition,
+            originalNode: nextNodeId
+          }
+        });
+      }
+    }
+
+    // ?? NORMAL WORKFLOW: Handle cases where smart positioning doesn't apply (regular users not in workflow)
+    console.log(`?? NORMAL WORKFLOW: Smart positioning did not apply, proceeding with standard assignment`);
+    
+    // Resolve assignees using normal logic
     let assignees = await resolveAssignees({
       work_flow_type: nd.work_flow_type,
-      action_user_id: finalActionUserId, // Use the extracted/fallback value
+      action_user_id: finalActionUserId,
       org_code,
       created_by,
-      originalCreator: created_by // In createDreamLiteDispute, the creator IS the original creator
+      originalCreator: created_by
     });
 
     if (!assignees.length) {
       console.warn(`?? No assignees found for node ${nextNodeId}, using fallback assignment to creator`);
-      // Fallback: assign to dispute creator
       assignees = [created_by];
     }
 
     console.log(`?? Found ${assignees.length} assignee(s): ${assignees.join(', ')}`);
 
-    // ?? AUTO-APPROVAL LOGIC: Check if dispute creator is assigned to first action node
+    // Check if creator would be assigned to themselves (normal auto-approval)
     const shouldAutoApprove = assignees.includes(created_by);
     
     if (shouldAutoApprove) {
-      console.log(`?? AUTO-APPROVAL: Dispute creator ${created_by} is assigned to first action node. Auto-approving and moving to next step.`);
+      console.log(`?? NORMAL AUTO-APPROVAL: Dispute creator ${created_by} is assigned to first node. Auto-approving and moving to next step.`);
       
-      // Get outgoing edges from current node to find next step
+      // Get next node in workflow
       const outgoingEdges = edges.filter(e => e.source_node_id === nextNodeId);
       const forwardEdge = outgoingEdges.find(e => 
         (e.direction || e.label || '').toLowerCase() === 'forward'
       );
       
       if (forwardEdge) {
-        // Run workflow engine with auto-approval to get the next assignee
         const autoApprovalPayload = {
           currentNodeId: String(nextNodeId),
           decision: 'forward',
@@ -2482,11 +3107,9 @@ exports.createDreamLiteDispute = async (req, res) => {
         
         const { nextNode: autoNextNode, log: autoLog } = await runWorkflowEngine({ nodes, edges }, autoApprovalPayload);
         
-        console.log(`?? AUTO-APPROVAL ENGINE LOG:`, autoLog);
-        
         if (autoNextNode && autoNextNode.type === 'action') {
-          // Get the next node's assignment info
-          const [nextNd] = await sequelize.query(
+          // Get next node assignment info
+          const [autoNd] = await sequelize.query(
             `SELECT wn.action_user_id, wn.json_node, COALESCE(wf.type,'role') AS work_flow_type
              FROM work_flow_nodes wn JOIN work_flows wf ON wn.work_flow_id = wf.id
              WHERE wn.work_flow_id = :wf AND wn.node_id = :node`,
@@ -2497,144 +3120,98 @@ exports.createDreamLiteDispute = async (req, res) => {
             }
           );
           
-          if (nextNd) {
-            let nextFinalActionUserId = nextNd.action_user_id;
-            if ((!nextFinalActionUserId || nextFinalActionUserId.toString().trim() === '') && nextNd.json_node) {
+          if (autoNd) {
+            let autoActionUserId = autoNd.action_user_id;
+            if ((!autoActionUserId || autoActionUserId.toString().trim() === '') && autoNd.json_node) {
               try {
-                const jsonData = JSON.parse(nextNd.json_node);
+                const jsonData = JSON.parse(autoNd.json_node);
                 if (jsonData.action_user_id) {
-                  nextFinalActionUserId = jsonData.action_user_id;
+                  autoActionUserId = jsonData.action_user_id;
                 }
               } catch (e) {
-                console.warn(`?? Auto-approval: Could not parse json_node for next node ${autoNextNode.id}:`, e.message);
+                console.warn(`?? Normal auto-approval: Could not parse json_node for auto node ${autoNextNode.id}:`, e.message);
               }
             }
             
-            const nextAssignees = await resolveAssignees({
-              work_flow_type: nextNd.work_flow_type,
-              action_user_id: nextFinalActionUserId,
+            const autoAssignees = await resolveAssignees({
+              work_flow_type: autoNd.work_flow_type,
+              action_user_id: autoActionUserId,
               org_code,
               created_by,
               originalCreator: created_by
             });
             
-            const nextNextStage = await getMeaningfulStageName(
-              autoNextNode.data, 
-              nextNd, 
-              org_code, 
+            const autoStage = await getMeaningfulStageName(
+              autoNextNode.data || {},
+              autoNd,
+              org_code,
               t
             );
             
-            console.log(`?? AUTO-APPROVAL: Moving to next node ${autoNextNode.id}, assigning to: ${nextAssignees.join(', ')}`);
-            
-            // Record the auto-approval in history for the original node
+            // Record auto-approval
             await sequelize.query(
-              `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, updated_at, updated_by, node_decision, comments)
-               VALUES(?, ?, ?, ?, ?, 'auto_approved', ?, NOW(), true, NOW(), ?, 'forward', 'Auto-approved by dispute creator')`,
+              `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, node_decision, comments)
+               VALUES(?, ?, ?, ?, ?, 'auto_approved', ?, NOW(), true, 'approved', ?)`,
               { 
-                replacements: [dispute_id, created_by, created_by, created_by, nextNodeId, nextStage, created_by], 
+                replacements: [
+                  dispute_id, created_by, created_by, created_by, 
+                  nextNodeId, nextStage, 'Creator auto-approved their own level'
+                ], 
                 transaction: t 
               }
             );
             
-            // Assign to the next node instead
-            const assignmentPromises = [];
-            const historyPromises = [];
-            
-            for (const assignee of nextAssignees) {
-              assignmentPromises.push(
-                sequelize.query(
-                  `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at)
-                   VALUES(?, ?, ?, ?, ?, NOW())`,
-                  { 
-                    replacements: [dispute_id, assignee, autoNextNode.id, nextNextStage, created_by], 
-                    transaction: t 
-                  }
-                )
+            // Assign to next level
+            for (const assignee of autoAssignees) {
+              await sequelize.query(
+                `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at, status)
+                 VALUES(?, ?, ?, ?, ?, NOW(), true)`,
+                { 
+                  replacements: [dispute_id, assignee, autoNextNode.id, autoStage, created_by], 
+                  transaction: t 
+                }
               );
 
-              historyPromises.push(
-                sequelize.query(
-                  `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status)
-                   VALUES(?, ?, ?, ?, ?, 'created', ?, NOW(), true)`,
-                  { 
-                    replacements: [dispute_id, created_by, created_by, assignee, autoNextNode.id, nextNextStage], 
-                    transaction: t 
-                  }
-                )
+              await sequelize.query(
+                `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status)
+                 VALUES(?, ?, ?, ?, ?, 'created', ?, NOW(), true)`,
+                { 
+                  replacements: [dispute_id, created_by, created_by, assignee, autoNextNode.id, autoStage], 
+                  transaction: t 
+                }
               );
             }
             
-            await Promise.all([...assignmentPromises, ...historyPromises]);
             await t.commit();
-            
-            console.log(`? Successfully created DreamLite dispute ${dispute_id} with auto-approval and assigned to ${nextAssignees.length} users: ${nextAssignees.join(', ')} at node ${autoNextNode.id}`);
             
             return res.status(201).json({ 
               status: true, 
               dispute_id, 
-              assigned_to: nextAssignees,
-              assignee_count: nextAssignees.length,
-              nextStage: nextNextStage,
+              assigned_to: autoAssignees,
+              assignee_count: autoAssignees.length,
+              nextStage: autoStage,
               auto_approved: true,
               debug: {
                 stoppedAtNode: autoNextNode.id,
-                nodeType: autoNextNode.type,
-                engineLog: log,
-                autoApprovalLog: autoLog,
+                nodeType: 'action',
+                autoApproval: true,
                 skippedNode: nextNodeId
               }
             });
           }
-        } else if (autoNextNode && (autoNextNode.type === 'end' || autoNextNode.data?.is_end === true)) {
-          // Auto-approval led directly to resolution
-          await sequelize.query(
-            `UPDATE disputes SET dispute_stage = 'resolved', updated_at = NOW(), updated_by = :by WHERE id = :id`,
-            { replacements: { by: created_by, id: dispute_id }, transaction: t }
-          );
-          
-          await sequelize.query(
-            `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status, updated_at, updated_by, node_decision, comments)
-             VALUES(?, ?, ?, ?, ?, 'auto_resolved', 'resolved', NOW(), true, NOW(), ?, 'forward', 'Auto-approved and resolved by dispute creator')`,
-            { 
-              replacements: [dispute_id, created_by, created_by, created_by, nextNodeId, created_by], 
-              transaction: t 
-            }
-          );
-          
-          await t.commit();
-          
-          return res.status(201).json({ 
-            status: true, 
-            dispute_id, 
-            assigned_to: null, 
-            isComplete: true,
-            auto_approved: true,
-            auto_resolved: true,
-            debug: {
-              stoppedAtNode: autoNextNode.id,
-              nodeType: autoNextNode.type,
-              engineLog: log,
-              autoApprovalLog: autoLog
-            }
-          });
         }
       }
-      
-      // Fallback: if auto-approval logic fails, continue with normal assignment but log the attempt
-      console.warn(`?? AUTO-APPROVAL: Failed to auto-approve, falling back to normal assignment`);
     }
 
-    // 9) Normal assignment logic (when no auto-approval needed or as fallback)
+    // Normal assignment (no auto-approval needed)
     const assignmentPromises = [];
     const historyPromises = [];
     
     for (const assignee of assignees) {
-      // Insert into dispute_flow for each assignee
       assignmentPromises.push(
         sequelize.query(
-          `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at)
-           VALUES(?, ?, ?, ?, ?, NOW())`,
+          `INSERT INTO dispute_flow(dispute_id, assigned_to, node_id, dispute_stage, created_by, assigned_at, status)
+           VALUES(?, ?, ?, ?, ?, NOW(), true)`,
           { 
             replacements: [dispute_id, assignee, nextNodeId, nextStage, created_by], 
             transaction: t 
@@ -2642,7 +3219,6 @@ exports.createDreamLiteDispute = async (req, res) => {
         )
       );
 
-      // Insert into dispute_history for each assignee
       historyPromises.push(
         sequelize.query(
           `INSERT INTO dispute_history(dispute_id, done_by, created_by, assigned_to, node_id, action, dispute_stage, created_at, status)
@@ -2654,48 +3230,19 @@ exports.createDreamLiteDispute = async (req, res) => {
         )
       );
     }
-
-    // Execute all assignments and history entries in parallel
+    
     await Promise.all([...assignmentPromises, ...historyPromises]);
-
     await t.commit();
 
-    const disputeData = {
-      priority,
-      severity,
-      description,
-      remarks
-    };
-
-    // ?? AUDIT LOG: Track DreamLite dispute creation
-    try {
-      await logAudit({
-        org_code,
-        object_type: "disputes",
-        object_id: dispute_id,
-        action: "CREATE_DREAMLITE",
-        changed_by: created_by,
-        old_values: null,
-        new_values: {
-          dispute_id,
-          work_flow_id: processedWorkFlowId,
-          template_id: processedTemplateId,
-          licence_type,
-          priority,
-          severity,
-          description,
-          dispute_type,
-          created_by,
-          assignees,
-          nextStage,
-          dream_lite_source_data: JSON.stringify(dream_lite_source_data),
-          dream_lite_modified_data: JSON.stringify(dream_lite_modified_data)
-        },
-        remarks: `DreamLite dispute created and assigned to ${assignees.length} user(s): ${assignees.join(', ')}. Remarks: ${remarks || 'None'}`
-      });
-    } catch (auditErr) {
-      console.warn('Audit logging failed for DreamLite dispute creation:', auditErr.message);
-    }
+    console.log(`? Successfully created DreamLite dispute ${dispute_id} with normal assignment and assigned to ${assignees.length} users: ${assignees.join(', ')}`);
+    
+    return res.status(201).json({ 
+      status: true, 
+      dispute_id, 
+      assigned_to: assignees,
+      assignee_count: assignees.length,
+      nextStage: nextStage
+    });
 
     // Send notifications asynchronously (don't await)
     sendDisputeNotifications({
@@ -2720,6 +3267,7 @@ exports.createDreamLiteDispute = async (req, res) => {
       assignee_count: assignees.length,
       nextStage,
       auto_approved: false,
+      smart_positioned: false,
       debug: {
         stoppedAtNode: nextNodeId,
         nodeType: nextNode.type,

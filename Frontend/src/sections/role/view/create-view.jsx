@@ -707,11 +707,15 @@ useEffect(() => {
               rowCount={templateRowCount}
               pagination
               paginationMode="server"
-              page={templatePage}
-              onPageChange={(newPage) => setTemplatePage(newPage)}
-              pageSize={templatePageSize}
-              onPageSizeChange={setTemplatePageSize}
-              rowsPerPageOptions={[5, 10, 20, 50]}
+              paginationModel={{
+                page: templatePage,
+                pageSize: templatePageSize,
+              }}
+              onPaginationModelChange={(model) => {
+                setTemplatePage(model.page);
+                setTemplatePageSize(model.pageSize);
+              }}
+              pageSizeOptions={[10, 25, 50, 100]}
               sortingMode="server"
               sortModel={templateSortModel}
               onSortModelChange={setTemplateSortModel}

@@ -80,8 +80,7 @@ export function Templates() {
       postService(endpoints.auth.getAll, 'POST', payload).then((res) => {
         if (res.status) {
           setFilteredTemplates(res.data);
-          // If your API returns total count for pagination
-          // setCount(res.totalCount || res.data.length);
+          setCount(Number(res.count) || 0);
         } else {
           console.log('No data found.');
         }
@@ -369,9 +368,9 @@ export function Templates() {
             </Table>
           </TableContainer>
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[10, 25, 50, 100]}
             component="div"
-            count={count || filteredTemplates.length}
+            count={count}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
