@@ -35,6 +35,11 @@ export default defineConfig({
       },
     ],
   },
+  define: {
+    // Inject build-time environment variables
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    __BUILD_HASH__: JSON.stringify(process.env.GITHUB_SHA || 'local-dev'),
+  },
   server: { port: PORT, host: true },
   preview: { port: PORT, host: true },
 });

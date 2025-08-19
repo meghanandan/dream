@@ -44,7 +44,11 @@ jobs:
 
       # Build (print logs, fail clearly)
       - name: Build
-        env: { NODE_ENV: production, CI: "false" } # avoid strict CI warnings killing the build
+        env: 
+          NODE_ENV: production
+          CI: "false" # avoid strict CI warnings killing the build
+          VITE_BUILD_TIME: ${{ github.event.head_commit.timestamp }}
+          VITE_BUILD_HASH: ${{ github.sha }}
         run: |
           echo "=== START BUILD ==="
           npm run build

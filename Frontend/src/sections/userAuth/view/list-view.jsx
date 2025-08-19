@@ -4,8 +4,9 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useState } from 'react';
-import { TextField } from '@mui/material';
+import { TextField, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { VersionDisplay, VersionText } from '../../../components/VersionDisplay';
 
 // Dummy user data with roles
 const dummyUsers = [
@@ -81,9 +82,17 @@ export function Login() {
                 Login
               </Button>
             </form>
+            
+            {/* Version information in card footer */}
+            <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
+              <VersionText showBuild />
+            </Box>
           </CardContent>
         </Card>
       </div>
+      
+      {/* Version display in corner */}
+      <VersionDisplay variant="minimal" position="bottom-right" />
     </div>
   );
 }
