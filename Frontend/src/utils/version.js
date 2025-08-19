@@ -9,19 +9,37 @@ import packageJson from '../../package.json';
  */
 export const getVersionInfo = () => {
   // Get build time from build-time injection or environment variables
-  const buildTime = typeof __BUILD_TIME__ !== 'undefined' 
-    ? new Date(__BUILD_TIME__).toLocaleDateString('en-US', {
+  let buildTime = 'Development';
+  let buildHash = 'local';
+  
+  try {
+    // Check if build-time variables are available
+    if (typeof window !== 'undefined' && window.__BUILD_TIME__) {
+      buildTime = new Date(window.__BUILD_TIME__).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-      })
-    : import.meta.env.VITE_BUILD_TIME || 'Development';
+      });
+    } else if (import.meta.env.VITE_BUILD_TIME) {
+      buildTime = new Date(import.meta.env.VITE_BUILD_TIME).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
     
-  const buildHash = typeof __BUILD_HASH__ !== 'undefined' 
-    ? __BUILD_HASH__ 
-    : import.meta.env.VITE_BUILD_HASH || 'local';
+    if (typeof window !== 'undefined' && window.__BUILD_HASH__) {
+      buildHash = window.__BUILD_HASH__;
+    } else if (import.meta.env.VITE_BUILD_HASH) {
+      buildHash = import.meta.env.VITE_BUILD_HASH;
+    }
+  } catch (error) {
+    console.warn('Build info not available:', error);
+  }
     
   const environment = import.meta.env.MODE || 'development';
   
