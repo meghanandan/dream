@@ -7,6 +7,10 @@
 !README.md
 !LICENSE
 !.editorconfig
+!CHANGELOG.md
+!RELEASE_NOTES.md
+!DEPLOYMENT.md
+!AI_WORKFLOW_SETUP.md
 
 # --- Keep CI workflows
 !.github/
