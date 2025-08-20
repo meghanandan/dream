@@ -10,7 +10,12 @@
 !CHANGELOG.md
 !RELEASE_NOTES.md
 !DEPLOYMENT.md
-!AI_WORKFLOW_SETUP.md
+
+# --- Ignore AI workflow setup
+AI_WORKFLOW_SETUP.md
+
+# --- Ignore local configuration files
+**/dream-ecosystem-local.config.js
 
 # --- Keep CI workflows
 !.github/
