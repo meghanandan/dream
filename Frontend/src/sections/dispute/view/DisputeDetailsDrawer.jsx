@@ -24,7 +24,7 @@ const getLabel = (headers, key) => {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
-const UPLOAD_BASE_URL = 'https://dream.uniflo.ai/api/api/auth/uploads/';
+const UPLOAD_BASE_URL = 'https://dream.uniflo.ai/api/auth/uploads/';
 
 // Converts a Windows file path to /uploads/filename.ext
 const getUploadUrl = (filePath) => {

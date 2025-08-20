@@ -42,5 +42,9 @@ router.use('/disputes', createProxyMiddleware({ target: services.disputes, ...pr
 router.use('/users', createProxyMiddleware({ target: services.users, ...proxyOptions }));
 router.use('/external-api', createProxyMiddleware({ target: services.externalApi, ...proxyOptions }));
 
+// Add specific route for uploaded files - this should come AFTER the /auth route
+// so that /auth/uploads requests are handled by the auth service
+console.log('Gateway routes configured for services:', services);
+
 // Export the router module
 module.exports = router;

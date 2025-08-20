@@ -70,6 +70,12 @@ registerBroadcast(broadcastToSockets);
 app.locals.broadcast = broadcastToSockets;
 
 app.use(cors({ origin: true, credentials: true }));
+
+// Add direct static file serving for uploads through gateway - BEFORE /api routes
+const path = require('path');
+const authUploadsPath = path.join(__dirname, '../../auth-service/src/uploads');
+app.use('/api/auth/uploads', express.static(authUploadsPath));
+
 app.use('/api', gatewayRoutes);
 
 // Add this function to your file, right before the app.post('/api/notify'...) route
