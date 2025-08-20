@@ -1,8 +1,5 @@
 // Version utility to get app version information
 
-// Import package.json to get version info
-import packageJson from '../../package.json';
-
 /**
  * Get application version information
  * @returns {Object} Version information object
@@ -44,7 +41,7 @@ export const getVersionInfo = () => {
   const environment = import.meta.env.MODE || 'development';
   
   return {
-    version: packageJson.version,
+    version: '1.2.0', // Hard-coded version to avoid import issues
     buildTime,
     buildHash: buildHash.substring(0, 7), // Short hash
     environment,
