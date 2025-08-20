@@ -94,7 +94,7 @@ export function DashboardLayout({ sx, children, data }) {
                // setLoading(false);
            }
            catch (error) {
-               console.error("Error while adding cluster:", error.response.data.message);
+               console.error("Error while adding cluster:", error.response?.data?.message || error.message);
                // setLoading(false);
            }
 
@@ -110,7 +110,7 @@ export function DashboardLayout({ sx, children, data }) {
                 ? {
                     title: item.text,
                     path: paths[item.slug]?.root || `/${item.slug}`,
-                    icon: item.text==='Data' ? <DataUsageIcon/>:<Settings/> || ICONS.default,
+                    icon: getIconForMenuItem(item.text),
                     children: item.submenu
                       .filter((subItem) => subItem.permissions?.view) // Filter submenu items with view: true
                       .map((subItem) => ({
@@ -121,28 +121,39 @@ export function DashboardLayout({ sx, children, data }) {
                 : {
                     title: item.text,
                     path: paths[item.slug]?.root || `/${item.slug}`,
-                    icon:
-                      item.text === "Home"
-                        ? <HomeIcon/>
-                        : item.text === "Templates"
-                        ? ICONS.plans
-                        : item.text === "Workflows"
-                        ? <Lan/>
-                        : item.text === "Analytics"
-                        ? <Analytics/>
-                        : item.text === "Disputes"
-                        ? <Gavel/>
-                        : item.text === "Quotas"
-                        ? <PieChart/>
-                        : item.text==='Data' ? <DataUsageIcon/>:
-                         item.text==='Set Up'?<Construction/>:
-                         item.text==='Payments'?<PaymentsIcon/>:item.text==='Adjustments'?<Calculate/>:item.text === "Settings" ? ICONS.plans:item.text === "Data Sources" ?
-
-                        <DatasetLinked/> :  ICONS.dashboard,
+                    icon: getIconForMenuItem(item.text),
                   }
             ),
         },
       ];
+
+      // Helper function to get icons for menu items
+      const getIconForMenuItem = (itemText) => {
+        const iconMap = {
+          "Home": <HomeIcon/>,
+          "Templates": ICONS.plans,
+          "Workflows": <Lan/>,
+          "Analytics": <Analytics/>,
+          "Disputes": <Gavel/>,
+          "Quotas": <PieChart/>,
+          "Quota": <PieChart/>, // Handle both "Quotas" and "Quota"
+          "Data": <DataUsageIcon/>,
+          "Set Up": <Construction/>,
+          "Payments": <PaymentsIcon/>,
+          "Adjustments": <Calculate/>,
+          "Settings": ICONS.plans,
+          "Data Sources": <DatasetLinked/>,
+          "Role": <ManageAccountsIcon/>,
+          "Users": <ManageAccountsIcon/>,
+          "Connectors": <SettingsInputComponent/>,
+          "Alias": <AdjustIcon/>,
+          "Customer Onboard": <AccountTree/>,
+          "Audit Logs": <Analytics/>,
+          "Custom Fields": <Settings/>,
+        };
+        
+        return iconMap[itemText] || ICONS.dashboard;
+      };
 
 // top navbar dream
   return (

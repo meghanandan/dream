@@ -937,7 +937,17 @@ exports.getRolePermissions = async (req, res) => {
             );
             if (results.length != 0) {
                 let mainPages = [];
-                results.forEach((parentRow, pkey) => {
+                let processedPageIds = new Set(); // Track processed pages to avoid duplicates
+                
+                // First, identify all parent pages (pages with no parent_page_id)
+                const parentPages = results.filter(row => row.parent_page_id == null);
+                
+                parentPages.forEach((parentRow) => {
+                    // Skip if this page was already processed
+                    if (processedPageIds.has(parentRow.page_id)) {
+                        return;
+                    }
+                    
                     let page = {
                         'page_id': parentRow['page_id'],
                         'text': parentRow['page_name'],
@@ -953,44 +963,52 @@ exports.getRolePermissions = async (req, res) => {
                             'approve': parentRow['is_approve'] || false
                         }
                     }
+                    
+                    // Find children for this parent
                     let subPages = [];
                     let viewStatusArr = [];
-                    results.forEach((childRow, ckey) => { 
-                        if (parentRow['page_id'] == childRow['parent_page_id']) {
-                            submenu = {
+                    let processedChildIds = new Set(); // Track processed child pages
+                    
+                    results.forEach((childRow) => { 
+                        if (parentRow['page_id'] == childRow['parent_page_id'] && !processedChildIds.has(childRow.page_id)) {
+                            let submenu = {
                                 'page_id': childRow['page_id'],
                                 'text': childRow['page_name'],
                                 'slug': childRow['slug'],
                                 'icon': childRow['icon'],
-                                'menu_order': '',
+                                'menu_order': childRow['menu_order'] || '',
                                 'permissions': {
                                     'view': childRow['is_view'],
                                     'edit': childRow['is_edit'],
                                     'add': childRow['is_add'],
                                     'delete': childRow['is_delete'],
                                     'download': childRow['is_download'],
-                                    'approve': parentRow['is_approve'] || false
+                                    'approve': childRow['is_approve'] || false
                                 }
                             }
                             subPages.push(submenu);
+                            processedChildIds.add(childRow.page_id);
                             viewStatusArr.push(childRow['is_view']);
                         }
-                    })
-                    // console.log("subpages",subPages);
+                    });
+                    
                     page['submenu'] = subPages;
-
-                    if (parentRow.parent_page_id == null) {
-                        if (viewStatusArr.length > 0) {
-                            var pageStatus = viewStatusArr.includes(true);
-                            if (pageStatus) {
-                                mainPages.push(page);
-                            }
-                        }
-                        else {
+                    
+                    // Add parent page based on visibility logic
+                    if (viewStatusArr.length > 0) {
+                        // Has children - add if any child is viewable
+                        var pageStatus = viewStatusArr.includes(true);
+                        if (pageStatus) {
                             mainPages.push(page);
                         }
+                    } else {
+                        // No children - add the page as is
+                        mainPages.push(page);
                     }
-                })
+                    
+                    processedPageIds.add(parentRow.page_id);
+                });
+                
                 res.status(200).json({ "status": true, "data": mainPages })
             }
             else {
