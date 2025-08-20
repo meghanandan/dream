@@ -939,7 +939,14 @@ exports.getRolePermissions = async (req, res) => {
                 let mainPages = [];
                 let processedPageIds = new Set(); // Track processed pages to avoid duplicates
                 
-                // First, identify all parent pages (pages with no parent_page_id)
+                // First, identify all child page IDs (pages that have a parent_page_id)
+                const childPageIds = new Set(
+                    results
+                        .filter(row => row.parent_page_id != null)
+                        .map(row => row.page_id)
+                );
+                
+                // Then, identify all parent pages (pages with no parent_page_id)
                 const parentPages = results.filter(row => row.parent_page_id == null);
                 
                 parentPages.forEach((parentRow) => {
@@ -1007,6 +1014,36 @@ exports.getRolePermissions = async (req, res) => {
                     }
                     
                     processedPageIds.add(parentRow.page_id);
+                });
+                
+                // Now add any standalone pages that are NOT children of other pages
+                const standalonePages = results.filter(row => 
+                    row.parent_page_id == null && 
+                    !processedPageIds.has(row.page_id)
+                );
+                
+                standalonePages.forEach((standaloneRow) => {
+                    // Double check this page is not a child of any other page
+                    if (!childPageIds.has(standaloneRow.page_id)) {
+                        let page = {
+                            'page_id': standaloneRow['page_id'],
+                            'text': standaloneRow['page_name'],
+                            'slug': standaloneRow['slug'],
+                            'icon': standaloneRow['icon'],
+                            'menu_order': standaloneRow['menu_order'],
+                            'permissions': {
+                                'view': standaloneRow['is_view'],
+                                'edit': standaloneRow['is_edit'],
+                                'add': standaloneRow['is_add'],
+                                'delete': standaloneRow['is_delete'],
+                                'download': standaloneRow['is_download'],
+                                'approve': standaloneRow['is_approve'] || false
+                            },
+                            'submenu': []
+                        };
+                        mainPages.push(page);
+                        processedPageIds.add(standaloneRow.page_id);
+                    }
                 });
                 
                 res.status(200).json({ "status": true, "data": mainPages })
