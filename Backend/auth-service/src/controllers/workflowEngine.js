@@ -199,8 +199,13 @@ async function runWorkflowEngine({ nodes = [], edges = [] }, payload = {}, hooks
       });
       
       // ?? SELECT BEST MATCHING EDGE
-      if (isApprovalDecision || !isRejectionDecision) {
-        // Look for approval path
+      // First, try to find exact direction match
+      const exactMatch = outgoing.find(e => (e.direction || e.label || '').toLowerCase() === want);
+      if (exactMatch) {
+        nextEdge = exactMatch;
+        logStep(log, `Found EXACT match for "${want}": edge "${exactMatch.direction || exactMatch.label}"`, current);
+      } else if (isApprovalDecision || !isRejectionDecision) {
+        // Look for approval path using intelligent analysis
         const approvalCandidates = edgeAnalysis.filter(a => a.isLikelyApproval).sort((a, b) => b.confidence - a.confidence);
         nextEdge = approvalCandidates.length > 0 ? approvalCandidates[0].edge : edgeAnalysis[0]?.edge;
         
@@ -209,7 +214,7 @@ async function runWorkflowEngine({ nodes = [], edges = [] }, payload = {}, hooks
           logStep(log, `Selected APPROVAL path: "${nextEdge.direction}" (confidence: ${analysis?.confidence || 0})`, current);
         }
       } else {
-        // Look for rejection path
+        // Look for rejection path using intelligent analysis
         const rejectionCandidates = edgeAnalysis.filter(a => a.isLikelyRejection).sort((a, b) => b.confidence - a.confidence);
         nextEdge = rejectionCandidates.length > 0 ? rejectionCandidates[0].edge : edgeAnalysis[1]?.edge || edgeAnalysis[0]?.edge;
         

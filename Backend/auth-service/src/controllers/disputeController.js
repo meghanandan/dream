@@ -1155,7 +1155,7 @@ exports.updateDispute = async (req, res) => {
 
     const payload = {
       currentNodeId: String(currentNodeId),
-      decision: decision.toLowerCase(),
+      decision: mappedDecision, // ?? FIX: Use mapped decision instead of original
       action: 'process'
     };
 

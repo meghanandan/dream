@@ -939,14 +939,15 @@ exports.getRolePermissions = async (req, res) => {
                 let mainPages = [];
                 let processedPageIds = new Set(); // Track processed pages to avoid duplicates
                 
-                // First, identify all child page IDs (pages that have a parent_page_id)
-                const childPageIds = new Set(
-                    results
-                        .filter(row => row.parent_page_id != null)
-                        .map(row => row.page_id)
-                );
+                // First, collect all pages that appear as children in ANY submenu
+                const allChildPageIds = new Set();
+                results.forEach(row => {
+                    if (row.parent_page_id != null) {
+                        allChildPageIds.add(row.page_id);
+                    }
+                });
                 
-                // Then, identify all parent pages (pages with no parent_page_id)
+                // Process only true parent pages (pages with no parent_page_id)
                 const parentPages = results.filter(row => row.parent_page_id == null);
                 
                 parentPages.forEach((parentRow) => {
@@ -996,6 +997,9 @@ exports.getRolePermissions = async (req, res) => {
                             subPages.push(submenu);
                             processedChildIds.add(childRow.page_id);
                             viewStatusArr.push(childRow['is_view']);
+                            
+                            // Mark this child as processed globally to prevent it from appearing as standalone
+                            processedPageIds.add(childRow.page_id);
                         }
                     });
                     
@@ -1009,41 +1013,13 @@ exports.getRolePermissions = async (req, res) => {
                             mainPages.push(page);
                         }
                     } else {
-                        // No children - add the page as is
-                        mainPages.push(page);
+                        // No children - but only add if this page is NOT a child of another page
+                        if (!allChildPageIds.has(parentRow.page_id)) {
+                            mainPages.push(page);
+                        }
                     }
                     
                     processedPageIds.add(parentRow.page_id);
-                });
-                
-                // Now add any standalone pages that are NOT children of other pages
-                const standalonePages = results.filter(row => 
-                    row.parent_page_id == null && 
-                    !processedPageIds.has(row.page_id)
-                );
-                
-                standalonePages.forEach((standaloneRow) => {
-                    // Double check this page is not a child of any other page
-                    if (!childPageIds.has(standaloneRow.page_id)) {
-                        let page = {
-                            'page_id': standaloneRow['page_id'],
-                            'text': standaloneRow['page_name'],
-                            'slug': standaloneRow['slug'],
-                            'icon': standaloneRow['icon'],
-                            'menu_order': standaloneRow['menu_order'],
-                            'permissions': {
-                                'view': standaloneRow['is_view'],
-                                'edit': standaloneRow['is_edit'],
-                                'add': standaloneRow['is_add'],
-                                'delete': standaloneRow['is_delete'],
-                                'download': standaloneRow['is_download'],
-                                'approve': standaloneRow['is_approve'] || false
-                            },
-                            'submenu': []
-                        };
-                        mainPages.push(page);
-                        processedPageIds.add(standaloneRow.page_id);
-                    }
                 });
                 
                 res.status(200).json({ "status": true, "data": mainPages })
