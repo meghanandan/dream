@@ -237,3 +237,64 @@ export function fSub({
 
   return result;
 }
+
+// ----------------------------------------------------------------------
+
+/** Convert UTC ISO string to local time
+ * Input: '2025-08-21T10:18:00Z' (UTC)
+ * Output: '21 Aug 2025 3:18 PM' (user's local timezone)
+ */
+export function fDateTimeFromUTC(utcString, format) {
+  if (!utcString) {
+    return 'N/A';
+  }
+
+  const isValid = dayjs(utcString).isValid();
+  
+  if (!isValid) {
+    return 'Invalid time value';
+  }
+
+  // dayjs automatically converts UTC to local timezone
+  return dayjs(utcString).format(format ?? formatStr.dateTime);
+}
+
+// ----------------------------------------------------------------------
+
+/** Convert UTC ISO string to local date only
+ * Input: '2025-08-21T10:18:00Z' (UTC)  
+ * Output: '21 Aug 2025' (user's local timezone)
+ */
+export function fDateFromUTC(utcString, format) {
+  if (!utcString) {
+    return 'N/A';
+  }
+
+  const isValid = dayjs(utcString).isValid();
+  
+  if (!isValid) {
+    return 'Invalid time value';
+  }
+
+  return dayjs(utcString).format(format ?? formatStr.date);
+}
+
+// ----------------------------------------------------------------------
+
+/** Convert UTC ISO string to local time only
+ * Input: '2025-08-21T10:18:00Z' (UTC)
+ * Output: '3:18 PM' (user's local timezone)
+ */
+export function fTimeFromUTC(utcString, format) {
+  if (!utcString) {
+    return 'N/A';
+  }
+
+  const isValid = dayjs(utcString).isValid();
+  
+  if (!isValid) {
+    return 'Invalid time value';
+  }
+
+  return dayjs(utcString).format(format ?? formatStr.time);
+}

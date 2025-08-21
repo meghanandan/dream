@@ -9,6 +9,7 @@ import {
   IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { fDateTimeFromUTC } from '../../../utils/format-time';
 
 const StepperModal = ({ open, onClose, history = [] }) => (
   <Modal open={open} onClose={onClose}>
@@ -54,21 +55,37 @@ const StepperModal = ({ open, onClose, history = [] }) => (
                   variant="subtitle1"
                   sx={{ fontWeight: 'bold', color: '#1976D2' }}
                 >
-                  {`Step ${step.step_no || index + 1}: ${step.dispute_stage || step.action || "No Status"}`}
+                  {`Step ${step.step_no || index + 1}: ${
+                    index === 0 
+                      ? 'Dispute Created'
+                      : step.action === 'Created'
+                        ? `Assigned to ${step.assigned_to_name || 'Unknown'}`
+                        : step.action === 'Assigned' || step.action === 'transition'
+                          ? `Assigned to ${step.assigned_to_name || 'Unknown'}`
+                          : step.action || 'Processing'
+                  }`}
                 </Typography>
                 <Typography sx={{ fontSize: '14px' }}>
-                  <strong>User:</strong> {step.created_by || step.done_by_name || "Unknown"}
+                  <strong>{index === 0 ? 'Created by' : 'User'}:</strong> {step.created_by || step.done_by_name || "Unknown"}
                 </Typography>
+                {index !== 0 && (
+                  <Typography sx={{ fontSize: '14px' }}>
+                    <strong>Assigned To:</strong> {step.present_at || step.assigned_to_name || "N/A"}
+                  </Typography>
+                )}
                 <Typography sx={{ fontSize: '14px' }}>
-                  <strong>Assigned To:</strong> {step.present_at || step.assigned_to_name || "N/A"}
+                  <strong>Date:</strong> {fDateTimeFromUTC(step.submitted_time)}
                 </Typography>
-                <Typography sx={{ fontSize: '14px' }}>
-                  <strong>Date:</strong> {step.submitted_time || "N/A"}
-                </Typography>
-                {/* If you want to show action or remarks */}
-                {step.action && (
+                {/* Show action for steps 2+ but with better logic */}
+                {index !== 0 && step.action && !['Assigned', 'transition', 'Created'].includes(step.action) && (
                   <Typography sx={{ fontSize: '14px' }}>
                     <strong>Action:</strong> {step.action}
+                  </Typography>
+                )}
+                {/* Show comments if they exist and are meaningful */}
+                {step.comments && step.comments.trim() && !step.comments.includes('auto-approved') && (
+                  <Typography sx={{ fontSize: '14px' }}>
+                    <strong>Comments:</strong> {step.comments}
                   </Typography>
                 )}
               </StepLabel>

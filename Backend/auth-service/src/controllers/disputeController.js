@@ -470,7 +470,7 @@ async function getHistoryForDispute(dispute_id) {
       dh.dispute_stage,
       dh.assigned_to,
       u2.first_name || ' ' || u2.last_name AS assigned_to_name,
-      TO_CHAR(dh.created_at,'MM-DD-YYYY HH24:MI') AS submitted_time,
+      TO_CHAR(dh.created_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS"Z"') AS submitted_time,
       dh.node_decision,
       dh.comments,
       dh.status,
@@ -524,6 +524,21 @@ async function getHistoryForDispute(dispute_id) {
       }
     }
   }
+  
+  // Simple action name mapping for better user experience
+  hist.forEach(step => {
+    switch(step.action) {
+      case 'smart_auto_approved':
+        step.action = 'Approved';
+        break;
+      case 'transition':
+        step.action = 'Assigned';
+        break;
+      case 'created':
+        step.action = 'Created';
+        break;
+    }
+  });
   
   return hist;
 }
@@ -858,7 +873,8 @@ exports.getPendingDreamLTEDisputesList = async (req, res) => {
     disp.attachments,disp.remarks,disp.dispute_stage,concat(usr.first_name,' ',usr.last_name) as raised_by 
     from disputes disp left join users usr on disp.created_by = usr.emp_id left join work_flows wf on disp.work_flow_id = wf.id 
     left join templates tmps on disp.template_id = tmps.id 
-    where disp.licence_type ='DREAMLTE' and disp.org_code = :org_code  ) main right join 
+    where disp.licence_type ='DREAMLTE' and disp.org_code = :org_code 
+      and disp.dispute_stage NOT IN ('resolved', 'rejected', 'approved') ) main inner join 
     (select 
       b.id as sub_dispute_id,
       STRING_AGG(DISTINCT u.first_name || ' ' || u.last_name, ', ' ORDER BY u.first_name || ' ' || u.last_name) AS pending_at,
@@ -871,7 +887,8 @@ exports.getPendingDreamLTEDisputesList = async (req, res) => {
       and a.assigned_to= :user_id 
       and a.updated_at is null
       and a.assigned_to IS NOT NULL
-      and a.action != 'smart_auto_approved'
+      and a.action NOT IN ('smart_auto_approved', 'rejected', 'approved')
+      and b.dispute_stage NOT IN ('resolved', 'rejected', 'approved')
     GROUP BY b.id, a.node_id) sub on main.dispute_id = sub.sub_dispute_id 
     ORDER BY main.dispute_date DESC,main.dispute_id desc`;
     
@@ -1057,16 +1074,36 @@ exports.updateDispute = async (req, res) => {
       }
     );
 
-    // 5) Update history
-    await sequelize.query(
+    // 5) Update current user's pending history record to mark as completed
+    const updateResult = await sequelize.query(
       `UPDATE dispute_history
-          SET updated_at = NOW(), updated_by = :by, action = :dec,
-              comments = :cm, node_decision = :dec, status = true
-        WHERE dispute_id = :id AND node_id = :node AND updated_at IS NULL`,
+          SET updated_at = NOW() AT TIME ZONE 'UTC', updated_by = :by, status = true
+        WHERE dispute_id = :id AND node_id = :node AND assigned_to = :by AND updated_at IS NULL
+        AND action IN ('transition', 'assigned', 'created')`,
       {
-        replacements: { id: dispute_id, node: currentNodeId, by: done_by, dec: decision, cm: comments },
+        replacements: { id: dispute_id, node: currentNodeId, by: done_by },
         transaction: t,
         type: sequelize.QueryTypes.UPDATE
+      }
+    );
+    
+    console.log(`?? Updated ${updateResult[1]} pending history records for user ${done_by}`);
+
+    // 5b) Create NEW history entry for the action taken
+    await sequelize.query(
+      `INSERT INTO dispute_history (dispute_id, node_id, assigned_to, done_by, action, comments, node_decision, status, created_at, updated_at, updated_by)
+       VALUES (:id, :node, :assignedTo, :by, :dec, :cm, :dec, true, NOW() AT TIME ZONE 'UTC', NOW() AT TIME ZONE 'UTC', :by)`,
+      {
+        replacements: { 
+          id: dispute_id, 
+          node: currentNodeId, 
+          assignedTo: done_by,
+          by: done_by, 
+          dec: decision, 
+          cm: comments 
+        },
+        transaction: t,
+        type: sequelize.QueryTypes.INSERT
       }
     );
 
@@ -1102,41 +1139,9 @@ exports.updateDispute = async (req, res) => {
     const mappedDecision = decisionMapping[decision.toLowerCase()] || decision.toLowerCase();
     console.log(`?? Mapping user decision "${decision}" to workflow direction "${mappedDecision}"`);
     
-    // ?? REJECTION VALIDATION: Only validate if workflow has ANY rejection paths
+    // ?? SIMPLIFIED REJECTION: Let workflow engine handle routing
     if (decision && (decision.toLowerCase() === 'rejected' || decision.toLowerCase() === 'reject')) {
-      console.log(`?? REJECTION VALIDATION: User wants to reject - checking workflow compatibility`);
-      
-      // Check if there are any rejection edges in the entire workflow
-      const rejectionEdges = edges.filter(e => {
-        const direction = (e.direction || e.label || '').toLowerCase();
-        return direction === mappedDecision || direction === 'no';
-      });
-      
-      console.log(`?? Found ${rejectionEdges.length} rejection-related edges in workflow`);
-      
-      // If workflow has NO rejection paths at all, allow rejection but log it
-      if (rejectionEdges.length === 0) {
-        console.log(`?? WORKFLOW COMPATIBILITY: No rejection paths in workflow - allowing rejection anyway`);
-        console.log(`?? User decision "${decision}" will be processed as "${mappedDecision}" despite no matching edges`);
-      } else {
-        // Workflow has rejection paths - validate current node can reject
-        const currentNodeRejectionEdges = edges.filter(e => 
-          (e.source_node_id || e.source) == currentNodeId && 
-          ((e.direction || e.label || '').toLowerCase() === mappedDecision || (e.direction || e.label || '').toLowerCase() === 'no')
-        );
-        
-        console.log(`?? Current node ${currentNodeId} has ${currentNodeRejectionEdges.length} rejection edges`);
-        
-        if (currentNodeRejectionEdges.length === 0) {
-          await t.rollback();
-          return res.status(400).json({
-            status: false,
-            message: "You cannot reject at this step. Please approve or contact your administrator."
-          });
-        }
-      }
-      
-      console.log(`?? REJECTION VALIDATION: Proceeding with rejection...`);
+      console.log(`?? REJECTION: User wants to reject - letting workflow engine handle routing`);
     }
     
     // Log the decision matching process using mapped decision
