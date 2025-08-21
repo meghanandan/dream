@@ -127,19 +127,22 @@ export function Workflows() {
       page_number: page + 1,
       page_size: rowsPerPage,
       org_code: userData.organization,
+      // Add filter for templates if viewing library
+      is_template: showTemplatesOnly ? true : undefined,
     };
     try {
       const res = await postService(endpoints.auth.getWorkFlowList, 'POST', payload);
       if (res.data && res.data.length > 0) {
         let filteredData = res.data;
         
-        // Filter for templates only if admin is viewing templates
-        if (showTemplatesOnly && isAdmin) {
+        // Additional frontend filtering if backend doesn't support is_template filter
+        if (showTemplatesOnly) {
           filteredData = res.data.filter(workflow => workflow.is_template === true);
         }
         
         setWorkflowsdata(filteredData);
-        setCount(showTemplatesOnly && isAdmin ? filteredData.length : Number(res.totalRecords) || 0);
+        // Use filtered count for templates, otherwise use total records
+        setCount(showTemplatesOnly ? filteredData.length : Number(res.totalRecords) || 0);
       } else {
         setWorkflowsdata([]);
         setCount(0);
@@ -486,7 +489,7 @@ export function Workflows() {
                 Create Workflow
               </Button>
             </Tooltip>
-            <Tooltip title={isAdmin ? (showTemplatesOnly ? "Show All Workflows" : "Show Library Only") : "Workflow Library"}>
+            <Tooltip title={showTemplatesOnly ? "Show All Workflows" : "Show Library Only"}>
               <Button
                 variant="contained"
                 sx={{
@@ -498,7 +501,7 @@ export function Workflows() {
                 startIcon={<LibraryBooks />}
                 onClick={handleLibraryClick}
               >
-                {isAdmin ? (showTemplatesOnly ? 'Show All' : 'Library') : 'Library'}
+                {showTemplatesOnly ? 'Show All' : 'Library'}
               </Button>
             </Tooltip>
           </Box>
@@ -516,7 +519,7 @@ export function Workflows() {
                 <TableCell><strong>S.No</strong></TableCell>
                 <TableCell><strong>Workflow Name</strong></TableCell>
                 <TableCell><strong>Type</strong></TableCell>
-                {showTemplatesOnly && isAdmin && (
+                {showTemplatesOnly && (
                   <>
                     <TableCell><strong>Library Category</strong></TableCell>
                     <TableCell><strong>Library Description</strong></TableCell>
@@ -530,7 +533,7 @@ export function Workflows() {
             <TableBody>
               {loading && workflowsdata.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={showTemplatesOnly && isAdmin ? 8 : 6} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={showTemplatesOnly ? 8 : 6} align="center" sx={{ py: 6 }}>
                     <CircularProgress size={26} />
                     <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
                       Loading workflows...
@@ -576,7 +579,7 @@ export function Workflows() {
                         ? row.type.charAt(0).toUpperCase() + row.type.slice(1).toLowerCase()
                         : '--'}
                     </TableCell>
-                    {showTemplatesOnly && isAdmin && (
+                    {showTemplatesOnly && (
                       <>
                         <TableCell>
                           {row.template_category ? (
@@ -689,7 +692,7 @@ export function Workflows() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={showTemplatesOnly && isAdmin ? 8 : 6} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={showTemplatesOnly ? 8 : 6} align="center" sx={{ py: 6 }}>
                     <Typography variant="subtitle1" gutterBottom>
                       {showTemplatesOnly ? 'No workflows in library' : 'No workflows found'}
                     </Typography>
