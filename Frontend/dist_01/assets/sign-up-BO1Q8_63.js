@@ -1,1 +1,0 @@
-import{j as t,H as e,C as i}from"./index-cVH_xp6I.js";import{a as s}from"./jwt-password-view-hGymbqOE.js";import"./VisibilityOff-9P1LaXwE.js";const a={title:`Sign up | Jwt - ${i.site.name}`};function o(){return t.jsxs(t.Fragment,{children:[t.jsx(e,{children:t.jsxs("title",{children:[" ",a.title]})}),t.jsx(s,{})]})}export{o as default};

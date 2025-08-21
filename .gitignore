@@ -32,6 +32,7 @@ AI_WORKFLOW_SETUP.md
 # --- Re-ignore common build & env stuff anywhere
 **/node_modules/
 **/dist/
+**/dist_01/
 **/build/
 **/.next/
 **/.nuxt/
@@ -48,6 +49,33 @@ AI_WORKFLOW_SETUP.md
 **/.env
 **/.env.*
 **/*.zip
+
+# --- Ignore uploads and temporary files
+**/uploads/
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp
+**/*.svg
+**/*.pdf
+**/*.doc
+**/*.docx
+**/*.xls
+**/*.xlsx
+**/*.csv
+**/*.txt
+!README.md
+!LICENSE
+!CHANGELOG.md
+!RELEASE_NOTES.md
+!DEPLOYMENT.md
+
+# --- Ignore test and debug files
+**/test-*.js
+**/debug-*.js
+**/*-test.js
+**/*-debug.js
 
 # --- Streamlit extras
 streamlit/venv/
