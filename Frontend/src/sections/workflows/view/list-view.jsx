@@ -289,18 +289,13 @@ export function Workflows() {
     await fetchTemplates();
   };
 
-  // Handle Library button click - different behavior for admin vs regular users
+  // Handle Library button click - now consistent for both admin and regular users
   const handleLibraryClick = () => {
-    if (isAdmin) {
-      // For admin, show template management within the same page
-      setShowTemplatesOnly(!showTemplatesOnly);
-      setSearchWorkflow('');
-      setSearchInput('');
-      setPage(0);
-    } else {
-      // Open user template library modal
-      handleLibraryOpen();
-    }
+    // For both admin and regular users, toggle template view within the same page
+    setShowTemplatesOnly(!showTemplatesOnly);
+    setSearchWorkflow('');
+    setSearchInput('');
+    setPage(0);
   };
 
   const handleLibraryClose = () => {
@@ -696,11 +691,11 @@ export function Workflows() {
                 <TableRow>
                   <TableCell colSpan={showTemplatesOnly && isAdmin ? 8 : 6} align="center" sx={{ py: 6 }}>
                     <Typography variant="subtitle1" gutterBottom>
-                      {showTemplatesOnly ? 'No templates found' : 'No workflows found'}
+                      {showTemplatesOnly ? 'No workflows in library' : 'No workflows found'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       {showTemplatesOnly 
-                        ? 'Create templates by marking approved workflows as templates.'
+                        ? 'Create workflows first, then mark approved ones as workflows for the library.'
                         : searchWorkflow
                         ? 'Try adjusting your search keywords.'
                         : 'Get started by creating a new workflow.'}
@@ -865,7 +860,8 @@ export function Workflows() {
         </DialogActions>
       </Dialog>
 
-      {/* Workflow Library Dialog */}
+      {/* Workflow Library Dialog - Commented out as it makes no sense in current context */}
+      {/* 
       <Dialog
         open={libraryModalOpen}
         onClose={handleLibraryClose}
@@ -976,6 +972,7 @@ export function Workflows() {
           </Button>
         </DialogActions>
       </Dialog>
+      */}
 
       {/* Snackbar for feedback */}
       <Snackbar
