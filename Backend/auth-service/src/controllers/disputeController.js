@@ -1084,29 +1084,49 @@ exports.updateDispute = async (req, res) => {
 
     console.log(`?? Total workflow: ${nodes.length} nodes, ${edges.length} edges`);
     
-    // ?? REJECTION VALIDATION: Check if rejection is allowed in this workflow
+    // 7) Apply decision mapping FIRST
+    // ?? FIX: Handle common workflow pattern where:
+    // - Action nodes have "forward" edges to decision nodes
+    // - Decision nodes have "yes"/"no" edges
+    // Map user decisions to workflow edge directions
+    const decisionMapping = {
+      'approved': 'yes',
+      'rejected': 'no', 
+      'approve': 'yes',
+      'reject': 'no',
+      'yes': 'yes',
+      'no': 'no',
+      'forward': 'forward'
+    };
+    
+    const mappedDecision = decisionMapping[decision.toLowerCase()] || decision.toLowerCase();
+    console.log(`?? Mapping user decision "${decision}" to workflow direction "${mappedDecision}"`);
+    
+    // ?? REJECTION VALIDATION: Check if rejection is allowed in this workflow using MAPPED decision
     if (decision && (decision.toLowerCase() === 'rejected' || decision.toLowerCase() === 'reject')) {
-      console.log(`?? REJECTION VALIDATION: Checking if rejection paths exist in workflow`);
+      console.log(`?? REJECTION VALIDATION: Checking if rejection paths exist for mapped decision "${mappedDecision}"`);
       
-      // Check if there are any rejection edges in the entire workflow
+      // Check if there are any rejection edges in the entire workflow using mapped decision
       const rejectionEdges = edges.filter(e => {
         const direction = (e.direction || e.label || '').toLowerCase();
         return direction.includes('reject') || 
                direction.includes('return') || 
                direction.includes('back') ||
-               direction === 'no';
+               direction === 'no' ||
+               direction === mappedDecision; // ?? Check for mapped decision too
       });
       
       console.log(`?? Found ${rejectionEdges.length} rejection-related edges in workflow:`, 
         rejectionEdges.map(e => ({ source: e.source_node_id, target: e.destination_node_id, direction: e.direction || e.label })));
       
-      // Also check if current node has rejection paths
+      // Also check if current node has rejection paths using mapped decision
       const currentNodeRejectionEdges = edges.filter(e => 
         (e.source_node_id || e.source) == currentNodeId && 
-        ['rejected', 'reject', 'return', 'back', 'no'].includes((e.direction || e.label || '').toLowerCase())
+        (['rejected', 'reject', 'return', 'back', 'no'].includes((e.direction || e.label || '').toLowerCase()) ||
+         (e.direction || e.label || '').toLowerCase() === mappedDecision)
       );
       
-      console.log(`?? Current node ${currentNodeId} has ${currentNodeRejectionEdges.length} rejection edges`);
+      console.log(`?? Current node ${currentNodeId} has ${currentNodeRejectionEdges.length} rejection edges (checking for "${mappedDecision}")`);
       
       if (rejectionEdges.length === 0) {
         await t.rollback();
@@ -1127,35 +1147,17 @@ exports.updateDispute = async (req, res) => {
       console.log(`?? REJECTION VALIDATION: Rejection is allowed, proceeding...`);
     }
     
-    // Log the decision matching process
-    console.log(`?? Looking for edges with direction matching: "${decision.toLowerCase()}"`);
+    // Log the decision matching process using mapped decision
+    console.log(`?? Looking for edges with direction matching mapped decision: "${mappedDecision}"`);
     const matchingEdges = edges.filter(e => 
       (e.source_node_id || e.source) == currentNodeId && 
-      (e.direction || e.label || '').toLowerCase() === decision.toLowerCase()
+      (e.direction || e.label || '').toLowerCase() === mappedDecision
     );
     console.log(`? Found ${matchingEdges.length} matching edges:`, matchingEdges);
 
-    // 7) Run workflow engine with decision mapping
-    // ?? FIX: Handle common workflow pattern where:
-    // - Action nodes have "forward" edges to decision nodes
-    // - Decision nodes have "yes"/"no" edges
-    // Map user decisions to workflow edge directions
-    const decisionMapping = {
-      'approved': 'yes',
-      'rejected': 'no', 
-      'approve': 'yes',
-      'reject': 'no',
-      'yes': 'yes',
-      'no': 'no',
-      'forward': 'forward'
-    };
-    
-    const mappedDecision = decisionMapping[decision.toLowerCase()] || decision.toLowerCase();
-    console.log(`?? Mapping user decision "${decision}" to workflow direction "${mappedDecision}"`);
-
     const payload = {
       currentNodeId: String(currentNodeId),
-      decision: mappedDecision, // ?? FIX: Use mapped decision instead of original
+      decision: mappedDecision, // ?? FIX: Use mapped decision
       action: 'process'
     };
 

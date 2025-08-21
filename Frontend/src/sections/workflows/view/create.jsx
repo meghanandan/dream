@@ -1055,11 +1055,11 @@ export function CreateWorkflow() {
             Save
           </Button>
         )}
-        {!workflowHeaderSaved && (
+        {/* {!workflowHeaderSaved && (
           <Typography variant="caption" sx={{ color: '#673ab7', fontSize: '0.75rem', fontStyle: 'italic' }}>
             💡 Save details to unlock AI workflow generation
           </Typography>
-        )}
+        )} */}
         {workflowHeaderSaved && (
           <>
             <Tooltip title="Update Workflow">
