@@ -1102,49 +1102,41 @@ exports.updateDispute = async (req, res) => {
     const mappedDecision = decisionMapping[decision.toLowerCase()] || decision.toLowerCase();
     console.log(`?? Mapping user decision "${decision}" to workflow direction "${mappedDecision}"`);
     
-    // ?? REJECTION VALIDATION: Check if rejection is allowed in this workflow using MAPPED decision
+    // ?? REJECTION VALIDATION: Only validate if workflow has ANY rejection paths
     if (decision && (decision.toLowerCase() === 'rejected' || decision.toLowerCase() === 'reject')) {
-      console.log(`?? REJECTION VALIDATION: Checking if rejection paths exist for mapped decision "${mappedDecision}"`);
+      console.log(`?? REJECTION VALIDATION: User wants to reject - checking workflow compatibility`);
       
-      // Check if there are any rejection edges in the entire workflow using mapped decision
+      // Check if there are any rejection edges in the entire workflow
       const rejectionEdges = edges.filter(e => {
         const direction = (e.direction || e.label || '').toLowerCase();
-        return direction.includes('reject') || 
-               direction.includes('return') || 
-               direction.includes('back') ||
-               direction === 'no' ||
-               direction === mappedDecision; // ?? Check for mapped decision too
+        return direction === mappedDecision || direction === 'no';
       });
       
-      console.log(`?? Found ${rejectionEdges.length} rejection-related edges in workflow:`, 
-        rejectionEdges.map(e => ({ source: e.source_node_id, target: e.destination_node_id, direction: e.direction || e.label })));
+      console.log(`?? Found ${rejectionEdges.length} rejection-related edges in workflow`);
       
-      // Also check if current node has rejection paths using mapped decision
-      const currentNodeRejectionEdges = edges.filter(e => 
-        (e.source_node_id || e.source) == currentNodeId && 
-        (['rejected', 'reject', 'return', 'back', 'no'].includes((e.direction || e.label || '').toLowerCase()) ||
-         (e.direction || e.label || '').toLowerCase() === mappedDecision)
-      );
-      
-      console.log(`?? Current node ${currentNodeId} has ${currentNodeRejectionEdges.length} rejection edges (checking for "${mappedDecision}")`);
-      
+      // If workflow has NO rejection paths at all, allow rejection but log it
       if (rejectionEdges.length === 0) {
-        await t.rollback();
-        return res.status(400).json({
-          status: false,
-          message: "You cannot reject this dispute. Please approve it or contact your administrator."
-        });
+        console.log(`?? WORKFLOW COMPATIBILITY: No rejection paths in workflow - allowing rejection anyway`);
+        console.log(`?? User decision "${decision}" will be processed as "${mappedDecision}" despite no matching edges`);
+      } else {
+        // Workflow has rejection paths - validate current node can reject
+        const currentNodeRejectionEdges = edges.filter(e => 
+          (e.source_node_id || e.source) == currentNodeId && 
+          ((e.direction || e.label || '').toLowerCase() === mappedDecision || (e.direction || e.label || '').toLowerCase() === 'no')
+        );
+        
+        console.log(`?? Current node ${currentNodeId} has ${currentNodeRejectionEdges.length} rejection edges`);
+        
+        if (currentNodeRejectionEdges.length === 0) {
+          await t.rollback();
+          return res.status(400).json({
+            status: false,
+            message: "You cannot reject at this step. Please approve or contact your administrator."
+          });
+        }
       }
       
-      if (currentNodeRejectionEdges.length === 0) {
-        await t.rollback();
-        return res.status(400).json({
-          status: false,
-          message: "You cannot reject at this step. Please approve or contact your administrator."
-        });
-      }
-      
-      console.log(`?? REJECTION VALIDATION: Rejection is allowed, proceeding...`);
+      console.log(`?? REJECTION VALIDATION: Proceeding with rejection...`);
     }
     
     // Log the decision matching process using mapped decision
